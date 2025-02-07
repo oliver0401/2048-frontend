@@ -31,6 +31,7 @@ export const GameLayout: React.FC<{
         blockSize="100%"
         alignItems="start"
         borderRadius={0}
+        overflow="hidden"
       >
         <Box
           justifyContent="center"

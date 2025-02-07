@@ -3,7 +3,9 @@ import styled, { css } from 'styled-components';
 export interface StyledButtonProps {
   disable?: boolean;
   mini?: boolean;
+  width?: string;
 }
+
 
 const getMiniProps = () => css`
   width: 24px;
@@ -26,6 +28,12 @@ const StyledButton = styled.button<StyledButtonProps>`
   color: ${({ theme: { palette } }) => palette.foreground};
   opacity: ${({ disable }) => disable && 0.7};
   cursor: ${({ disable }) => (disable ? 'not-allowed' : 'pointer')};
+  width: ${({ width }) => width};
+  transition: background-color 0.3s;
+  &:hover {
+    background-color: ${({ theme: { palette } }) => palette.secondary};
+  }
 `;
+
 
 export default StyledButton;

@@ -49,7 +49,11 @@ export interface StyledBoxProps {
   alignItems?: 'center' | 'start' | 'end' | 'stretch';
   background?: Color;
   borderRadius?: Length;
+  gap?: Spacing;
+  overflow?: 'hidden' | 'visible' | 'scroll' | 'auto';
+  zIndex?: number;
 }
+
 
 const getBoxSizeStyles = ({
   position,
@@ -119,7 +123,13 @@ const StyledBox = styled.div<StyledBoxProps>`
   border-radius: ${({ theme, borderRadius }) =>
     borderRadius ?? theme.borderRadius};
   color: ${({ theme: { palette } }) => palette.foreground};
+  box-sizing: border-box;
+  padding: 0;
   ${getBoxSizeStyles}
+  gap: ${({ gap }) => gap && SpacingValues[gap]};
+  overflow: ${({ overflow }) => overflow};
+  z-index: ${({ zIndex }) => zIndex};
 `;
+
 
 export default StyledBox;

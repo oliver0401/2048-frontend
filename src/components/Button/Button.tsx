@@ -3,7 +3,9 @@ import StyledButton, { StyledButtonProps } from './StyledButton';
 
 export interface ButtonProps extends StyledButtonProps {
   onClick: () => void;
+  width?: string;
 }
+
 
 const Button = forwardRef<HTMLButtonElement, PropsWithChildren<ButtonProps>>(
   ({ onClick, disable = false, ...rest }, ref) => (
