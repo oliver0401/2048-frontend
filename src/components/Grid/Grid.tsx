@@ -1,27 +1,39 @@
 import React, { FC, useMemo } from 'react';
 import { createIndexArray } from '../../utils/common';
-import StyledCell from './StyledCell';
-import StyledGrid, { StyledGridProps } from './StyledGrid';
 
-export type GridProps = StyledGridProps;
+export interface GridProps {
+  width: number;
+  height: number;
+  rows: number;
+  cols: number;
+  spacing: number;
+}
 
 const Grid: FC<GridProps> = ({ width, height, rows, cols, spacing }) => {
   const Cells = useMemo(() => {
     const cells = createIndexArray(rows * cols);
-    return cells.map((c) => <StyledCell key={c} />);
+    return cells.map((c) => (
+      <div
+        key={c}
+        className="w-full h-full bg-tertiary dark:bg-tertiary-dark rounded opacity-30"
+      />
+    ));
   }, [rows, cols]);
 
   return (
-    <StyledGrid
-      width={width}
-      height={height}
-      rows={rows}
-      cols={cols}
-      spacing={spacing}
+    <div
+      className="box-border grid bg-secondary dark:bg-secondary-dark rounded-md border-8 border-secondary dark:border-secondary-dark"
+      style={{
+        width: `${width}px`,
+        height: `${height}px`,
+        gridTemplateRows: `repeat(${rows}, 1fr)`,
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        gap: `${spacing}px`,
+      }}
     >
       {Cells}
-    </StyledGrid>
+    </div>
   );
 };
 
-export default React.memo(Grid);
+export default Grid;

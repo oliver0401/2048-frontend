@@ -1,7 +1,4 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
-import Box from '../Box';
-import Text from '../Text';
-import StyledScore from './StyledScore';
 
 export interface ScoreBoardProps {
   title: string;
@@ -18,36 +15,29 @@ const ScoreBoard: FC<ScoreBoardProps> = ({ total, title }) => {
   }, [total]);
 
   return (
-    <Box
-      marginInline="s2"
-      paddingBlock="s3"
-      inlineSize="92px"
-      background="secondary"
-      flexDirection="column"
-      position="relative"
-      justifyContent="center"
-      boxSizing="border-box"
-    >
-      <Text
-        fontSize={12}
-        textTransform="uppercase"
-        fontWeight="bold"
-        color="tertiary"
-      >
+    <div className="mx-2 py-3 w-[92px] bg-secondary dark:bg-secondary-dark flex flex-col relative justify-center items-center box-border rounded-md">
+      <span className="text-xs uppercase font-bold text-tertiary dark:text-tertiary-dark">
         {title}
-      </Text>
-      <Text color="foreground" fontWeight="bold" fontSize={18}>
+      </span>
+      <span className="text-lg font-bold text-foreground dark:text-foreground-dark">
         {total}
-      </Text>
+      </span>
       {score > 0 && (
-        // Assign a different key to let React render the animation from beginning
-        <StyledScore key={total}>
-          <Text fontSize={18} fontWeight="bold" color="primary">
+        <div 
+          key={total}
+          className="
+            absolute left-0 bottom-[10px] w-full 
+            text-center bg-transparent 
+            transition-all duration-200 ease-in
+            animate-fade-out
+          "
+        >
+          <span className="text-lg font-bold text-primary dark:text-primary-dark">
             +{score}
-          </Text>
-        </StyledScore>
+          </span>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
 

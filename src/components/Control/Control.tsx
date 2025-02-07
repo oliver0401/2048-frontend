@@ -1,15 +1,14 @@
 import React, { FC } from 'react';
-import { MAX_SCALE, MIN_SCALE } from '../../utils/constants';
-import Box from '../Box';
+import { MIN_SCALE, MAX_SCALE } from '../../utils/constants';
 import Button from '../Button';
 import Text from '../Text';
 
-export interface ControlProps {
+interface ControlProps {
   rows: number;
   cols: number;
   onReset: () => void;
-  onChangeRow: (newRow: number) => void;
-  onChangeCol: (newCol: number) => void;
+  onChangeRow: (delta: number) => void;
+  onChangeCol: (delta: number) => void;
 }
 
 const Control: FC<ControlProps> = ({
@@ -19,18 +18,18 @@ const Control: FC<ControlProps> = ({
   onChangeRow,
   onChangeCol,
 }) => (
-  <Box inlineSize="100%" justifyContent="space-between">
+  <div className="w-full flex justify-between">
     <Button onClick={onReset}>
       <Text fontSize={16} textTransform="capitalize">
         new game
       </Text>
     </Button>
-    <Box>
-      <Box marginInlineEnd="s6" flexDirection="column">
+    <div className="flex">
+      <div className="mr-6 flex flex-col items-center">
         <Text textTransform="uppercase" fontSize={13} color="primary">
           rows
         </Text>
-        <Box padding="s2">
+        <div className="px-2 flex items-center">
           <Button
             mini
             onClick={() => onChangeRow(-1)}
@@ -38,11 +37,11 @@ const Control: FC<ControlProps> = ({
           >
             -
           </Button>
-          <Box marginInline="s3">
+          <div className="mx-3">
             <Text fontSize={16} color="primary">
               {rows}
             </Text>
-          </Box>
+          </div>
           <Button
             mini
             onClick={() => onChangeRow(1)}
@@ -50,13 +49,13 @@ const Control: FC<ControlProps> = ({
           >
             +
           </Button>
-        </Box>
-      </Box>
-      <Box flexDirection="column">
+        </div>
+      </div>
+      <div className="flex flex-col items-center">
         <Text textTransform="uppercase" fontSize={13} color="primary">
           cols
         </Text>
-        <Box padding="s2">
+        <div className="px-2 flex items-center">
           <Button
             mini
             onClick={() => onChangeCol(-1)}
@@ -64,11 +63,11 @@ const Control: FC<ControlProps> = ({
           >
             -
           </Button>
-          <Box marginInline="s3">
+          <div className="mx-3">
             <Text fontSize={16} color="primary">
               {cols}
             </Text>
-          </Box>
+          </div>
           <Button
             mini
             onClick={() => onChangeCol(1)}
@@ -76,10 +75,10 @@ const Control: FC<ControlProps> = ({
           >
             +
           </Button>
-        </Box>
-      </Box>
-    </Box>
-  </Box>
+        </div>
+      </div>
+    </div>
+  </div>
 );
 
-export default React.memo(Control);
+export default Control;

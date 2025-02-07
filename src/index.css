@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply text-lg font-['Roboto',Arial,sans-serif];
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  #game {
+    @apply w-screen h-screen;
+  }
+}
+
 html, body, #game {
     height: 100%;
     width: 100%;

@@ -1,7 +1,6 @@
 import React from 'react';
 import { GameLayout } from '../layouts';
 import Text from '../components/Text';
-import Box from '../components/Box';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import useLocalStorage from '../hooks/useLocalStorage';
@@ -9,65 +8,45 @@ import { ThemeName } from '../themes/types';
 import LightBg from '../assets/img/landing-light.png';
 import DarkBg from '../assets/img/landing-dark.png';
 
-
-
 export const Home: React.FC = () => {
   const [config] = useLocalStorage('theme', {
     theme: ThemeName.DEFAULT,
   });
+
   return (
     <GameLayout>
-      <Box
-        inlineSize="100%"
-        flexDirection="column"
-        justifyContent="center"
-        margin="s4"
-        gap="s4"
-        zIndex={10}
-        background='transparent'
-      >
+      <div className="w-full flex flex-col justify-center my-4 gap-4 z-10 bg-transparent">
         <Text fontSize={32} as="p" color="primary">
           Sign In
         </Text>
-        <Box
-          gap="s1"
-          inlineSize={'100%'}
-          flexDirection="column"
-          alignItems="start"
-        >
+        <div className="w-full flex flex-col items-start gap-1">
           <Text fontSize={16} as="p" color="primary">
             Email:
           </Text>
-          <Input placeholder="Enter your email" width={'100%'} fontSize={18} />
-        </Box>
-        <Box
-          gap="s1"
-          inlineSize={'100%'}
-          flexDirection="column"
-          alignItems="start"
-        >
+          <Input placeholder="Enter your email" width="100%" fontSize={18} />
+        </div>
+        <div className="w-full flex flex-col items-start gap-1">
           <Text fontSize={16} as="p" color="primary">
             Password:
           </Text>
           <Input
             placeholder="Enter your password"
-            width={'100%'}
+            width="100%"
             fontSize={18}
           />
-        </Box>
-        <Button onClick={() => {}} width={'100%'}>
+        </div>
+        <Button onClick={() => {}} width="w-full">
           Sign In
         </Button>
-      </Box>
+      </div>
       <img
         src={config.theme === ThemeName.DEFAULT ? LightBg : DarkBg}
+        className="absolute opacity-50"
         style={{
-          position: 'absolute',
           top: 325,
           left: 25,
           width: '400px',
           height: '700px',
-          opacity: 0.5,
           rotate: '30deg',
         }}
         alt="Background"

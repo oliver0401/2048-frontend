@@ -1,6 +1,5 @@
 import React, { FC, useCallback, useEffect } from 'react';
-import Box from '../components/Box';
-import Control from '../components/Control/Control';
+import Control from '../components/Control';
 import GameBoard from '../components/GameBoard';
 import ScoreBoard from '../components/ScoreBoard';
 import Text from '../components/Text';
@@ -75,22 +74,16 @@ export const Game: FC = () => {
 
   return (
     <GameLayout>
-      <Box
-        inlineSize="100%"
-        justifyContent="space-between"
-        marginBlockStart="s2"
-      >
-        <Box>
+      <div className="w-full flex justify-between mt-2">
+        <div className="flex justify-center items-center">
           <Text fontSize={64} fontWeight="bold" color="primary">
             2048
           </Text>
-        </Box>
-        <Box justifyContent="center">
           <ScoreBoard total={total} title="score" />
           <ScoreBoard total={best} title="best" />
-        </Box>
-      </Box>
-      <Box marginBlockStart="s2" marginBlockEnd="s6" inlineSize="100%">
+        </div>
+      </div>
+      <div className="w-full mt-2 mb-6">
         <Control
           rows={rows}
           cols={cols}
@@ -98,7 +91,7 @@ export const Game: FC = () => {
           onChangeRow={setRows}
           onChangeCol={setCols}
         />
-      </Box>
+      </div>
       <GameBoard
         tiles={tiles}
         boardSize={GRID_SIZE}
@@ -111,14 +104,16 @@ export const Game: FC = () => {
         onMergePending={onMergePending}
         onCloseNotification={onCloseNotification}
       />
-      <Box marginBlock="s4" justifyContent="center" flexDirection="column">
+      <div className="my-4 flex justify-center flex-col">
         <Text fontSize={16} as="p" color="primary">
           ✨ Join tiles with the same value to get 2048
         </Text>
         <Text fontSize={16} as="p" color="primary">
           🕹️ Play with arrow keys or swipe
         </Text>
-      </Box>
+      </div>
     </GameLayout>
   );
 };
+
+export default Game;
