@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "A React clone of 2048 game",
-  "main": "src/index.js",
+  "main": "electron/main.js",
   "scripts": {
     "build": "npm run tsc && vite build",
     "start": "vite --host",
@@ -13,7 +13,10 @@
     "format": "prettier --write .",
     "tsc": "tsc -p tsconfig.json --noEmit",
     "deploy": "npm run build && gh-pages -d dist",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "electron:start": "vite --host & electron .",
+    "electron:build": "npm run build && electron-builder",
+    "electron:serve": "electron ."
   },
   "keywords": [
     "React",
@@ -32,18 +35,24 @@
     "url": "https://github.com/kwrush/react-2048/issues"
   },
   "dependencies": {
+    "ethers": "^6.13.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^7.1.5",
     "styled-components": "^5.3.6",
-    "styled-normalize": "^8.0.7"
+    "styled-normalize": "^8.0.7",
+    "web3": "^4.16.0"
   },
   "devDependencies": {
+    "@types/node": "^22.13.0",
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.6",
     "@types/styled-components": "^5.1.26",
     "@typescript-eslint/eslint-plugin": "^5.12.0",
     "@typescript-eslint/parser": "^5.12.0",
     "@vitejs/plugin-react": "^2.1.0",
+    "electron": "^34.0.2",
+    "electron-builder": "^25.1.8",
     "eslint": "^8.25.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",
@@ -55,10 +64,18 @@
     "favicons": "^7.0.1",
     "gh-pages": "^4.0.0",
     "http-server": "^14.1.1",
-    "husky": "^7.0.4",
     "prettier": "^2.3.2",
-    "typescript": "^4.5.4",
+    "typescript": "^5.7.3",
     "vite": "^3.1.8",
     "vite-plugin-pwa": "^0.13.1"
+  },
+  "build": {
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
   }
 }

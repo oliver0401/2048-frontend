@@ -4,6 +4,7 @@ import type { PluginOption } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import type { VitePWAOptions } from 'vite-plugin-pwa';
+import path from 'path';
 /* eslint-enable import/no-extraneous-dependencies */
 
 const pwaOptions: Partial<VitePWAOptions> = {
@@ -45,6 +46,12 @@ export default defineConfig(({ mode }) => {
     plugins,
     build: {
       emptyOutDir: true,
+      outDir: 'dist',
+      rollupOptions: {
+        input: {
+          main: path.resolve(__dirname, 'index.html'),
+        },
+      },
     },
   };
 });
