@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Game, Home } from './pages';
 import { PATH } from './consts';
-
+import './index.css';
 export const App = () => {
   return (
     <BrowserRouter>

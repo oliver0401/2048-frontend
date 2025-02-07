@@ -38,7 +38,7 @@ export const Home: React.FC = () => {
           <Text fontSize={16} as="p" color="primary">
             Email:
           </Text>
-          <Input placeholder="Enter your email" width={'328px'} fontSize={18} />
+          <Input placeholder="Enter your email" width={'100%'} fontSize={18} />
         </Box>
         <Box
           gap="s1"
@@ -51,7 +51,7 @@ export const Home: React.FC = () => {
           </Text>
           <Input
             placeholder="Enter your password"
-            width={'328px'}
+            width={'100%'}
             fontSize={18}
           />
         </Box>
