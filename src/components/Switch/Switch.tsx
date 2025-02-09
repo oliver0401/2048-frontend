@@ -6,7 +6,7 @@ export interface SwitchProps {
   activeValue: string;
   inactiveValue: string;
   title?: string;
-  onChange: (value: string) => void;
+  onChange: Function;
 }
 
 const Switch: FC<SwitchProps> = ({
