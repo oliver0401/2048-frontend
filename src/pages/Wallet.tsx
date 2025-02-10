@@ -1,11 +1,11 @@
 import React from 'react';
-import { HomeContainer } from '../containers';
+import { WalletContainer } from '../containers';
 import { HomeLayout } from '../layouts';
 
-export const Home: React.FC = () => {
+export const Wallet: React.FC = () => {
   return (
     <HomeLayout>
-      <HomeContainer />
+      <WalletContainer />
     </HomeLayout>
   );
 };

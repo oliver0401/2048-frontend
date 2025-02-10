@@ -1,24 +1,26 @@
 import React from 'react';
 import { Color } from '../../themes/types';
 
-export interface ButtonProps {
-  onClick: () => void;
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  onClick?: () => void;
   disable?: boolean;
   mini?: boolean;
   width?: string;
   children: React.ReactNode;
   className?: string;
-  color?: Color
+  color?: Color;
 }
 
 const Button: React.FC<ButtonProps> = ({
   onClick,
-  disable = false,
+  disabled = false,
   mini = false,
   width,
   children,
   className,
   color = 'primary',
+  ...props
 }) => {
   const colorClasses = {
     primary: 'bg-primary dark:bg-primary-dark',
@@ -44,24 +46,22 @@ const Button: React.FC<ButtonProps> = ({
   };
   return (
     <button
-
-
       onClick={onClick}
-      disabled={disable}
+      disabled={disabled}
       className={`
         ${mini ? 'w-6 h-6 text-xs' : 'px-4 py-2 text-base'}
         ${width || ''}
         outline-none border-none
         rounded
-        ${disable ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-        bg-primary dark:bg-primary-dark 
+        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-secondary dark:hover:bg-secondary-dark'}
         text-foreground dark:text-foreground-dark
         transition-colors duration-300
-        hover:bg-secondary dark:hover:bg-secondary-dark
         disabled:opacity-50
         ${colorClasses[color]}
         ${className}
+
       `}
+      {...props}
     >
       {children}
     </button>

@@ -40,13 +40,14 @@ const Tile: FC<TileProps> = ({
 
   return (
     <div
-      className="absolute top-0 left-0 flex justify-center transition-transform duration-150 ease-in-out bg-transparent"
+      className="absolute top-0 left-0 flex justify-center transition-transform duration-100 ease-in-out bg-transparent"
       style={{
         width: `${width}px`,
         height: `${height}px`,
         fontSize: `${getTileFontSize(width, height, value)}px`,
         transform: `translate(${x}px, ${y}px)`,
       }}
+
     >
       <div
         className={`

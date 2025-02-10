@@ -1,11 +1,12 @@
-import React from "react";
+import React from 'react';
 
-interface InputProps {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   placeholder?: string;
   width?: string;
   fontSize?: number;
   type?: 'text' | 'password' | 'email';
   className?: string;
+  error?: string;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -14,13 +15,17 @@ const Input: React.FC<InputProps> = ({
   fontSize = 16,
   type = 'text',
   className,
+  error,
+  ...props
 }) => {
   return (
-    <input
+    <div className="relative w-full">
 
-      type={type}
-      placeholder={placeholder}
-      className={`
+      <input
+        type={type}
+        placeholder={placeholder}
+        className={`
+
         w-full px-4 py-2
         bg-transparent
         border border-primary dark:border-primary-dark
@@ -33,12 +38,16 @@ const Input: React.FC<InputProps> = ({
         transition-colors duration-200
         ${className}
       `}
-      style={{
-        width,
-        fontSize: `${fontSize}px`,
-      }}
+        style={{
+          width,
+          fontSize: `${fontSize}px`,
+        }}
+        {...props}
+      />
+      <p className='text-red-500 text-sm'>{error}</p>
+    </div>
 
-    />
+
   );
 };
 

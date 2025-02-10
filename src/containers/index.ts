@@ -3,3 +3,4 @@ export * from './Home';
 export * from './Address';
 export * from './SignIn';
 export * from './SignUp';
+export * from './Wallet';
