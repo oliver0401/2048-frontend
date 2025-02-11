@@ -1,13 +1,24 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Text from '../Text';
 import { useMainContext } from '../../context/MainContext';
 import { PATH } from '../../consts';
 import { useNavigate } from 'react-router-dom';
+import { useClipboard } from '../../hooks/useClipboard';
+import { HiOutlineClipboardDocument, HiOutlineClipboardDocumentCheck } from 'react-icons/hi2';
 
 const Navbar: React.FC = () => {
   const { user, handleSignOut } = useMainContext();
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+
+  const { onClick, content } = useClipboard(
+    user?.address || '',
+    <HiOutlineClipboardDocument className='text-primary dark:text-primary-dark' />,
+    <HiOutlineClipboardDocumentCheck className='text-primary dark:text-primary-dark' />,
+  );
   const menuItems = useMemo(
     () => [
       {
@@ -30,7 +41,6 @@ const Navbar: React.FC = () => {
       <div className="flex items-center gap-2 relative">
         <div className="cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
           <Text
-
             as="h1"
             color="primary"
             fontSize={16}
@@ -64,13 +74,29 @@ const Navbar: React.FC = () => {
           ))}
         </div>
       </div>
-      <div className="flex items-center gap-2">
-        <Text as="h1" color="primary" fontSize={16} className="font-bold">
-          Address:{' '}
-          {user?.address
-            ? `${user.address.slice(0, 7)}...${user.address.slice(-5)}`
-            : ''}
-        </Text>
+      <div className="flex items-center gap-2 relative group">
+        <div 
+          className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={onClick}
+        >
+          <Text
+            as="span"
+            color="primary"
+            fontSize={16}
+            className="font-bold"
+          >
+            Address:
+          </Text>
+          <Text
+            as="span"
+            color="primary"
+            fontSize={16}
+            className="font-mono"
+          >
+            {user?.address?.slice(0, 7)}...{user?.address?.slice(-5)}
+          </Text>
+          {content}
+        </div>
       </div>
     </div>
   );

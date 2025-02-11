@@ -33,7 +33,11 @@ export type GameBoardParams = {
   cols: number;
   gameState: GameState;
   addScore: (score: number) => void;
+  initialTiles?: Tile[];
+  initialGrid?: Cell[][];
 };
+
+
 
 const createNewTile = (r: number, c: number): Tile => {
   const index = nextTileIndex();
@@ -223,13 +227,21 @@ const resetGameBoard = (rows: number, cols: number) => {
   };
 };
 
-const useGameBoard = ({ rows, cols, gameState, addScore }: GameBoardParams) => {
+const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGrid }: GameBoardParams) => {
   const gridMapRef = useLazyRef(() => {
-    const grid = create2DArray<Cell>(rows, cols);
-    const tiles = createInitialTiles(grid);
-    tiles.forEach((tile) => {
-      grid[tile.r][tile.c] = tile;
-    });
+    let grid: Cell[][];
+    let tiles: Tile[];
+
+    if (initialGrid && initialTiles) {
+      grid = initialGrid.map(row => [...row]);
+      tiles = initialTiles.map(tile => ({ ...tile }));
+    } else {
+      grid = create2DArray<Cell>(rows, cols);
+      tiles = createInitialTiles(grid);
+      tiles.forEach((tile) => {
+        grid[tile.r][tile.c] = tile;
+      });
+    }
 
     return { grid, tiles };
   });

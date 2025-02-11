@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from 'react';
 import { TSignIn, TSignUp, TUser } from '../types';
 import api from '../utils/api';
 import { useNavigate } from 'react-router-dom';
@@ -22,10 +28,15 @@ interface MainContextType {
   setMnemonic: (mnemonic: string[]) => void;
   handleConfirmStoreSeed: (seed: string) => Promise<void>;
   handleSignOut: () => void;
+  handleGetPrivateKey: (email: string, password: string) => Promise<string>;
 }
 
-
 const MainContext = createContext<MainContextType | undefined>(undefined);
+
+// Add a utility function for error logging
+const logError = (error: any) => {
+  console.error(error);
+};
 
 export const MainProvider: React.FC<{ children: ReactNode }> = ({
   children,
@@ -35,26 +46,42 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [token, setToken] = useLocalStorage('token', '');
   const [mnemonic, setMnemonic] = useState<string[]>([]);
+  const [password, setPassword] = useLocalStorage('password', '');
 
-  const handleSignIn = async (user: TSignIn) => {
+  const handleSignIn = async (signIn: TSignIn) => {
     try {
-      const { data } = await api().post('/auth/signin', user);
+      const { data } = await api().post('/auth/signin', signIn);
+      setPassword(signIn.password);
       setToken(data.token);
       setIsAuthenticated(true);
       setUser(data.user);
-      
-      if (data.user.address !== null) {
-        navigate(PATH.GAME);
-      } else {
-        const { data: seedData } = await api(LOCAL_URL).post('/get-seed', {
-          email: user.email,
-          password: user.password,
+      try {
+        const { data: walletData } = await api(LOCAL_URL).post('/get-seed', {
+          ...signIn,
         });
-        setMnemonic(seedData.split(' '));
+        if (!walletData.confirm) {
+          // first login
+          setMnemonic(walletData.seed.split(' '));
+          navigate(PATH.ADDRESS);
+        } else {
+          // already logged in
+          const { address } = ethers.Wallet.fromPhrase(walletData.seed);
+          console.log(address);
+          setUser({ ...data.user, address });
+          navigate(PATH.GAME);
+        }
+      } catch (error) {
+        // first login on other device
+        const seed = generateMnemonic(128);
+        await api(LOCAL_URL).post('/store-seed', {
+          data: { seed, confirm: false },
+          ...signIn,
+        });
+        setMnemonic(seed.split(' '));
         navigate(PATH.ADDRESS);
       }
     } catch (error) {
-      console.error(error);
+      logError(error);
     }
   };
 
@@ -63,17 +90,26 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
       await api().post('/auth/signup', user);
       const { password, email } = user;
       const seed = generateMnemonic(128);
-      await api(LOCAL_URL).post('/store-seed', { seed, password, email });
+      await api(LOCAL_URL).post('/store-seed', {
+        data: { seed, confirm: false },
+        password,
+        email,
+      });
       navigate(PATH.SIGN_IN);
     } catch (error) {
-      console.error(error);
+      logError(error);
     }
   };
 
   const handleGetUser = async () => {
     try {
       const { data } = await api().get('/auth');
-      setUser(data.user);
+      const { data: walletData } = await api(LOCAL_URL).post('/get-seed', {
+        email: data.user.email,
+        password: password,
+      });
+      const { address } = ethers.Wallet.fromPhrase(walletData.seed);
+      setUser({ ...data.user, address });
       setIsAuthenticated(true);
     } catch (error) {
       console.error(error);
@@ -85,10 +121,13 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
 
   const handleConfirmStoreSeed = async (seed: string) => {
     try {
-      const wallet = ethers.Wallet.fromPhrase(seed);
-      const address = wallet.address;
-      await api().put('/auth', { address });
+      await api(LOCAL_URL).put('/store-confirm', {
+        email: user?.email,
+        password,
+      });
       if (user) {
+        const wallet = ethers.Wallet.fromPhrase(seed);
+        const address = wallet.address;
         setUser({ ...user, address });
         navigate(PATH.GAME);
       }
@@ -104,9 +143,20 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
     navigate(PATH.SIGN_IN);
   };
 
+  const handleGetPrivateKey = async (email: string, password: string) => {
+    const { data } = await api(LOCAL_URL).post('/get-private-key', {
+      email,
+      password,
+    });
+    return data.privateKey;
+  };
+
+  useEffect(() => {
+    console.log('password', password);
+  }, [password]);
+
   return (
     <MainContext.Provider
-
       value={{
         user,
         setUser,
@@ -121,10 +171,10 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
         setMnemonic,
         handleConfirmStoreSeed,
         handleSignOut,
+        handleGetPrivateKey,
       }}
     >
       {children}
-
     </MainContext.Provider>
   );
 };

@@ -9,6 +9,8 @@ interface ControlProps {
   onReset: () => void;
   onChangeRow: (delta: number) => void;
   onChangeCol: (delta: number) => void;
+  maxScaleRows: number;
+  maxScaleCols: number;
 }
 
 const Control: FC<ControlProps> = ({
@@ -17,6 +19,8 @@ const Control: FC<ControlProps> = ({
   onReset,
   onChangeRow,
   onChangeCol,
+  maxScaleRows,
+  maxScaleCols,
 }) => (
   <div className="w-full flex justify-between">
     <Button onClick={onReset}>
@@ -33,7 +37,7 @@ const Control: FC<ControlProps> = ({
           <Button
             mini
             onClick={() => onChangeRow(-1)}
-            disable={rows === MIN_SCALE}
+            disabled={rows === MIN_SCALE}
           >
             -
           </Button>
@@ -45,7 +49,7 @@ const Control: FC<ControlProps> = ({
           <Button
             mini
             onClick={() => onChangeRow(1)}
-            disable={rows === MAX_SCALE}
+            disabled={rows === maxScaleRows}
           >
             +
           </Button>
@@ -59,7 +63,7 @@ const Control: FC<ControlProps> = ({
           <Button
             mini
             onClick={() => onChangeCol(-1)}
-            disable={cols === MIN_SCALE}
+            disabled={cols === MIN_SCALE}
           >
             -
           </Button>
@@ -71,7 +75,7 @@ const Control: FC<ControlProps> = ({
           <Button
             mini
             onClick={() => onChangeCol(1)}
-            disable={cols === MAX_SCALE}
+            disabled={cols === maxScaleCols}
           >
             +
           </Button>

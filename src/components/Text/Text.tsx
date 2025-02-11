@@ -2,7 +2,7 @@ import React from 'react';
 import { Color } from '../../themes/types';
 
 export interface TextProps {
-  as?: 'p' | 'span' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label';
+  as?: 'p' | 'span' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label' | 'div' | 'pre';
   color?: Color;
   fontSize?: number;
   fontWeight?: 'bold' | 'normal';

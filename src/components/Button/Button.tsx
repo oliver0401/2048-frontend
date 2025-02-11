@@ -3,7 +3,6 @@ import { Color } from '../../themes/types';
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  onClick?: () => void;
   disable?: boolean;
   mini?: boolean;
   width?: string;
@@ -51,9 +50,9 @@ const Button: React.FC<ButtonProps> = ({
       className={`
         ${mini ? 'w-6 h-6 text-xs' : 'px-4 py-2 text-base'}
         ${width || ''}
-        outline-none border-none
+        outline-none
         rounded
-        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-secondary dark:hover:bg-secondary-dark'}
+        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-500/80 dark:hover:bg-secondary-dark'}
         text-foreground dark:text-foreground-dark
         transition-colors duration-300
         disabled:opacity-50

@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 export const useToggle = (value: boolean) => {
   const [open, setOpen] = useState<boolean>(value);
-  const toggle = () => {
+  const onToggle = () => {
     setOpen(!open);
   };
 
@@ -12,5 +12,5 @@ export const useToggle = (value: boolean) => {
   const onOpen = () => {
     setOpen(true);
   };
-  return { open, toggle, onClose, onOpen };
+  return { open, onToggle, onClose, onOpen };
 };

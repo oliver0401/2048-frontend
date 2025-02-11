@@ -24,7 +24,6 @@ export const useWallet = () => {
     setConfirmWords({ ...confirmWords, [e.target.name]: e.target.value });
   };
   useEffect(() => {
-    console.log(confirmWords);
     let flag = true;
     for (const index of random) {
       if (confirmWords[`${index}`] !== mnemonic[index]) {

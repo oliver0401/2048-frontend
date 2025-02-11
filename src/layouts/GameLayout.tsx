@@ -30,7 +30,7 @@ export const GameLayout: React.FC<{
       <div className="relative z-20 flex flex-col justify-start w-full h-full items-center rounded-none overflow-hidden">
         <Navbar />
         <div className="flex justify-start flex-col h-full items-center" style={{ width: `${GRID_SIZE}px` }}>
-          <div className="w-full flex justify-end relative z-10">
+          <div className="w-full flex justify-end relative z-10 py-2">
             <Switch
               title="dark mode"
               checked={themeName === ThemeName.DARK}

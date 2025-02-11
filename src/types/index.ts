@@ -3,6 +3,11 @@ export type TUser = {
   username: string;
   email: string;
   address?: string;
+  maxScore: number;
+  maxTile: number;
+  minMoves: number;
+  rows: number;
+  cols: number;
 };
 
 

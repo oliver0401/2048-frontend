@@ -5,13 +5,21 @@ export const useClipboard = (
   originalContent: React.ReactNode,
   changeContent: React.ReactNode,
 ) => {
-  navigator.clipboard.writeText(clipboardText);
   const [content, setContent] = useState(originalContent);
+  const [isCopied, setIsCopied] = useState(false);
   const onClick = () => {
-    setContent(changeContent);
-    setTimeout(() => {
-      setContent(originalContent);
-    }, 3000);
+    navigator.clipboard.writeText(clipboardText)
+      .then(() => {
+        setIsCopied(true);
+        setContent(changeContent);
+        setTimeout(() => {
+          setContent(originalContent);
+          setIsCopied(false);
+        }, 3000);
+      })
+      .catch(err => {
+        console.error('Failed to copy: ', err);
+      });
   };
-  return { onClick, content };
+  return { onClick, content, isCopied };
 };

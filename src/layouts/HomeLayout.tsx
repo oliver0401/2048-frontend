@@ -26,7 +26,7 @@ export const HomeLayout: React.FC<{
     <div className="min-h-screen h-full w-full bg-background dark:bg-background-dark transition-colors duration-200">
       <div className="relative z-20 flex justify-center w-full h-full items-start rounded-none overflow-hidden">
         <div className="flex justify-start flex-col h-full items-center" style={{ width: `${GRID_SIZE}px` }}>
-          <div className="mt-6 w-full flex justify-end relative z-10">
+          <div className="mt-6 w-full flex justify-end relative z-10 py-2">
             <Switch
               title="dark mode"
               checked={themeName === ThemeName.DARK}
