@@ -19,7 +19,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs }) => {
         {tabs.map((tab) => (
           <button
             key={tab.label}
-            className={`p-2 text-primary-dark dark:text-primary-dark ${activeTab === tab.label ? 'font-bold border-b-2 border-primary-dark dark:border-primary-dark' : ''}`}
+            className={`cursor-none p-2 text-primary-dark dark:text-primary-dark ${activeTab === tab.label ? 'font-bold border-b-2 border-primary-dark dark:border-primary-dark' : ''}`}
             style={{width: `${100 / tabs.length}%`}}
             onClick={() => setActiveTab(tab.label)}
           >

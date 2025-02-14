@@ -19,7 +19,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
       onClick={onClose}
     >
       <div
-        className="bg-background/80 min-w-96 max-w-96 min-h-40 dark:bg-background-dark/80 p-4 rounded shadow-lg transform transition-transform duration-300 ease-in-out scale-100"
+        className="bg-background/80 max-w-[calc(100vw-40px)] min-w-96 min-h-40 dark:bg-background-dark/80 p-4 rounded shadow-sm dark:shadow-white/30 transform transition-transform duration-300 ease-in-out scale-100"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="w-full flex justify-between items-center">
@@ -32,8 +32,8 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
             {title}
           </Text>
           <IoMdClose
-            size={20}
-            className="cursor-pointer text-primary dark:text-primary-dark"
+            size={28}
+            className="text-primary dark:text-primary-dark hover:bg-primary/20 dark:hover:bg-primary-dark/20 transition-all rounded-full p-1"
             onClick={onClose}
           />
         </div>

@@ -66,7 +66,7 @@ export const AddressContainer: React.FC = () => {
         </div>
       )}
       <div
-        className="w-full flex items-center justify-end gap-2 cursor-pointer"
+        className="w-full flex items-center justify-end gap-2"
         onClick={() => {
           onClick();
           onOpen();

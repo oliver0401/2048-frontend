@@ -8,6 +8,7 @@ import LightBg from '../assets/img/landing-light.png';
 import DarkBg from '../assets/img/landing-dark.png';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import CustomCursor from '../components/Cursor';
 type Configuration = {
   theme: ThemeName;
 };
@@ -27,6 +28,7 @@ export const GameLayout: React.FC<{
 
   return (
     <div className="min-h-screen h-full w-full bg-background dark:bg-background-dark transition-colors duration-200">
+      <CustomCursor />
       <div className="relative z-20 flex flex-col justify-start w-full h-full items-center rounded-none overflow-hidden">
         <Navbar />
         <div className="flex justify-start flex-col h-full items-center" style={{ width: `${GRID_SIZE}px` }}>

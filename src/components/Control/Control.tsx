@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { MIN_SCALE, MAX_SCALE } from '../../utils/constants';
+import { MIN_SCALE } from '../../utils/constants';
 import Button from '../Button';
 import Text from '../Text';
 

@@ -1,15 +1,27 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { getTileFontSize } from '../../utils/common';
+import { ThemeImage, useMainContext } from '../../context/MainContext';
+import { MOUSE } from '../../consts';
+import { useToggle } from '../../hooks/useToggle';
+import { Location } from '../../hooks/useGameBoard';
 
 export interface TileProps {
-  value: number;
+  value: ThemeImage;
   x: number;
   y: number;
   width: number;
   height: number;
   isNew?: boolean;
   isMerging?: boolean;
+  breakTile: (tile: Location) => void;
 }
+
+const glass = [
+  'https://i.postimg.cc/pL4qDqP3/glass1.png',
+  'https://i.postimg.cc/66PLLMNS/glass2.png',
+  'https://i.postimg.cc/nzjK6m4T/glass3.png',
+  'https://i.postimg.cc/QM5xwxB1/glass4.png',
+];
 
 const Tile: FC<TileProps> = ({
   value,
@@ -19,6 +31,7 @@ const Tile: FC<TileProps> = ({
   height,
   isNew = false,
   isMerging = false,
+  breakTile,
 }) => {
   // Safelist the tile color classes
   const getTileColorClass = (val: number) => {
@@ -37,28 +50,72 @@ const Tile: FC<TileProps> = ({
     };
     return colorMap[val] || colorMap[2]; // fallback to 2 if value not found
   };
+  const { cursor, setCursor, themeImages, theme } = useMainContext();
+  const { open, onOpen, onClose } = useToggle(false);
+  const [breakImg, setBreakImg] = useState<string>(
+    glass[Math.floor(Math.random() * 4)],
+  );
+
+  console.log('theme', theme);
+
+  const handleClick = () => {
+    if (cursor === MOUSE.Hammer) {
+      breakTile({ r: Math.floor(y / height), c: Math.floor(x / width) });
+      setCursor(MOUSE.Default);
+    }
+  };
 
   return (
     <div
       className="absolute top-0 left-0 flex justify-center transition-transform duration-100 ease-in-out bg-transparent"
+      onMouseOver={() => {
+        if (cursor === MOUSE.Hammer) {
+          onOpen();
+        }
+      }}
+      onMouseLeave={() => {
+        if (cursor === MOUSE.Hammer) {
+          setBreakImg(glass[Math.floor(Math.random() * 4)]);
+          onClose();
+        }
+      }}
+      onClick={handleClick}
       style={{
         width: `${width}px`,
         height: `${height}px`,
         fontSize: `${getTileFontSize(width, height, value)}px`,
         transform: `translate(${x}px, ${y}px)`,
       }}
-
     >
+      {open && (
+        <img
+          src={breakImg}
+          alt="break"
+          className="absolute top-0 left-0 w-full h-full z-20"
+        />
+      )}
       <div
         className={`
           w-full h-full flex items-center justify-center
-          rounded select-none
+          rounded-3xl select-none
           ${getTileColorClass(value)}
-          ${value > 4 ? 'text-foreground dark:text-foreground-dark' : 'text-primary dark:text-primary-dark'}
+          ${
+            value > 4
+              ? 'text-foreground dark:text-foreground-dark'
+              : 'text-primary dark:text-primary-dark'
+          }
           ${isMerging ? 'animate-pop' : isNew ? 'animate-expand' : ''}
         `}
       >
-        {value}
+        {theme === 'default' ? (
+          value
+        ) : (
+          <img
+            src={themeImages[value]}
+            alt="evolve"
+            className="w-full h-full"
+          />
+        )}
       </div>
     </div>
   );

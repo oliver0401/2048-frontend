@@ -4,8 +4,7 @@ import { Game, Home, SignIn, SignUp, Address, Profile } from './pages';
 import { PATH } from './consts';
 import './index.css';
 import { PrivateRoute } from './components/PrivateRoute';
-import { MainProvider } from './context/MainContext';
-import { GameProvider } from './context/GameContext';
+import { MainProvider,GameProvider } from './context';
 import { Wallet } from './pages/Wallet';
 import { Shop } from './pages/Shop';
 

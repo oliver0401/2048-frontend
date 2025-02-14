@@ -2,7 +2,18 @@ import React from 'react';
 import { Color } from '../../themes/types';
 
 export interface TextProps {
-  as?: 'p' | 'span' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label' | 'div' | 'pre';
+  as?:
+    | 'p'
+    | 'span'
+    | 'h1'
+    | 'h2'
+    | 'h3'
+    | 'h4'
+    | 'h5'
+    | 'h6'
+    | 'label'
+    | 'div'
+    | 'pre';
   color?: Color;
   fontSize?: number;
   fontWeight?: 'bold' | 'normal';
@@ -11,7 +22,6 @@ export interface TextProps {
   className?: string;
   onClick?: () => void;
 }
-
 
 const Text: React.FC<TextProps> = ({
   as: Component = 'span',
@@ -41,10 +51,10 @@ const Text: React.FC<TextProps> = ({
     tile1024: 'text-tile-1024 dark:text-tile-1024-dark',
   };
 
-
   return (
     <Component
       className={`
+        cursor-none
         ${color ? colorClasses[color as keyof typeof colorClasses] : ''}
         ${textTransform ? `${textTransform}` : ''}
         ${fontWeight ? `font-${fontWeight}` : ''}
@@ -59,4 +69,4 @@ const Text: React.FC<TextProps> = ({
   );
 };
 
-export default Text; 
+export default Text;

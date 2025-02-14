@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Text from '../components/Text';
 import Input from '../components/Input';
 import Button from '../components/Button';
-import { PATH } from '../consts';
+import { IMAGES, PATH } from '../consts';
 import { useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useMainContext } from '../context/MainContext';
+import { preloadImages } from '../utils/preloadImg';
 
 export const SignInContainer: React.FC = () => {
   const navigate = useNavigate();
@@ -25,6 +26,10 @@ export const SignInContainer: React.FC = () => {
       actions.resetForm();
     },
   });
+
+  useEffect(() => {
+    preloadImages([...IMAGES.GLASS]);
+  }, [preloadImages]);
 
   return (
     <>
@@ -86,7 +91,7 @@ export const SignInContainer: React.FC = () => {
             as="label"
             fontSize={18}
             color="tile64"
-            className="cursor-pointer"
+            className=""
             onClick={() => navigate(PATH.SIGN_UP)}
           >
             Sign Up

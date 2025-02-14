@@ -1,22 +1,25 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import Control from '../components/Control';
-import GameBoard from '../components/GameBoard';
-import ScoreBoard from '../components/ScoreBoard';
-import Text from '../components/Text';
-import useGameBoard, { Cell, Tile } from '../hooks/useGameBoard';
-import useGameScore from '../hooks/useGameScore';
-import useGameState, { GameStatus } from '../hooks/useGameState';
-import useScaleControl from '../hooks/useScaleControl';
-import { GRID_SIZE, MIN_SCALE, SPACING } from '../utils/constants';
-import useLocalStorage from '../hooks/useLocalStorage';
-import { canGameContinue, isWin } from '../utils/rules';
-import { useMainContext } from '../context/MainContext';
+import Control from '../../components/Control';
+import GameBoard from '../../components/GameBoard';
+import ScoreBoard from '../../components/ScoreBoard';
+import Text from '../../components/Text';
+import useGameBoard, { Cell, Tile } from '../../hooks/useGameBoard';
+import useGameScore from '../../hooks/useGameScore';
+import useGameState, { GameStatus } from '../../hooks/useGameState';
+import useScaleControl from '../../hooks/useScaleControl';
+import { GRID_SIZE, MIN_SCALE, SPACING } from '../../utils/constants';
+import useLocalStorage from '../../hooks/useLocalStorage';
+import { canGameContinue, isWin } from '../../utils/rules';
+import { useMainContext } from '../../context/MainContext';
+import { BsLightningFill } from 'react-icons/bs';
+import './game.css';
 
 export type Configuration = {
   bestScore: number;
   totalScore: number;
   rows: number;
   cols: number;
+  count: number;
   initialGrid: Cell[][];
   initialTiles: Tile[];
 };
@@ -24,7 +27,7 @@ export type Configuration = {
 const APP_NAME = 'react-2048';
 
 export const GameContainer: FC = () => {
-  const { user } = useMainContext();
+  const { user, boltOpen, onBoltClose, boltStatus, setBoltStatus } = useMainContext();
   const [gameState, setGameStatus] = useGameState({
     status: 'running',
     pause: false,
@@ -33,25 +36,28 @@ export const GameContainer: FC = () => {
   const [config, setConfig] = useLocalStorage<Configuration>(APP_NAME, {
     bestScore: 0,
     totalScore: 0,
+    count: 0,
     rows: MIN_SCALE,
     cols: MIN_SCALE,
-    initialGrid: [],
+    initialGrid: [Array(MIN_SCALE).fill(undefined), Array(MIN_SCALE).fill(undefined)],
     initialTiles: [],
   });
 
   const [rows, setRows] = useScaleControl(config.rows, user?.rows || 4);
   const [cols, setCols] = useScaleControl(config.cols, user?.cols || 4);
 
-  const { total, best, addScore, setTotal } = useGameScore(
+  const { total, best, count, addScore, setTotal, addCount, setCount } = useGameScore(
     config.bestScore,
     config.totalScore,
+    config.count
   );
 
-  const { tiles, grid, onMove, onMovePending, onMergePending } = useGameBoard({
+  const { tiles, grid, onMove, onMovePending, onMergePending, breakTile } = useGameBoard({
     rows,
     cols,
     gameState,
     addScore,
+    addCount,
     initialGrid: config.initialGrid,
     initialTiles: config.initialTiles,
   });
@@ -81,6 +87,7 @@ export const GameContainer: FC = () => {
 
   if (gameState.status === 'restart') {
     setTotal(0);
+    setCount(0);
     setGameStatus('running');
   } else if (gameState.status === 'running' && isWin(tiles)) {
     setGameStatus('win');
@@ -99,20 +106,31 @@ export const GameContainer: FC = () => {
     setConfig({
       rows,
       cols,
+      count,
       bestScore: best,
       totalScore: total,
       initialGrid: grid.map((row) => row.map((cell) => cell || undefined)),
       initialTiles: tiles.map((tile) => ({ ...tile })),
     });
-  }, [rows, cols, best, total, setConfig]);
+  }, [rows, cols, best, total, setConfig, count]);
+
+  useEffect(() => {
+    if (boltStatus.enabled && count - boltStatus.currentStart >= 10) {
+      setBoltStatus({
+        enabled: false,
+        currentStart: 0,
+      });
+    }
+  }, [count]);
 
   return (
-    <div className="custom-cursor">
+    <div className="relative">
+      <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center" onAnimationEnd={onBoltClose}>
+        {boltOpen && <BsLightningFill size={128} className="z-20 text-blue-500 bolt-fade-out pointer-events-none" />}
+      </div>
       <div className="w-full flex justify-between mt-2">
-        <div className="flex justify-center items-center">
-          <Text fontSize={64} fontWeight="bold" color="primary">
-            2048
-          </Text>
+        <div className="flex w-full justify-center items-center">
+          <ScoreBoard total={count} title="count" />
           <ScoreBoard total={total} title="score" />
           <ScoreBoard total={best} title="best" />
         </div>
@@ -139,6 +157,7 @@ export const GameContainer: FC = () => {
         onMovePending={onMovePending}
         onMergePending={onMergePending}
         onCloseNotification={onCloseNotification}
+        breakTile={breakTile}
       />
       <div className="my-4 flex justify-center flex-col">
         <Text fontSize={16} as="p" color="primary">

@@ -15,7 +15,7 @@ const Grid: FC<GridProps> = ({ width, height, rows, cols, spacing }) => {
     return cells.map((c) => (
       <div
         key={c}
-        className="w-full h-full bg-tertiary dark:bg-tertiary-dark rounded opacity-30"
+        className="w-full h-full bg-tertiary dark:bg-tertiary-dark rounded-2xl opacity-30"
       />
     ));
   }, [rows, cols]);

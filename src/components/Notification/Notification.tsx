@@ -15,7 +15,7 @@ const Notification: FC<NotificationProps> = ({ win, onClose }) => (
     </div>
     <button
       onClick={onClose}
-      className="outline-none border-none px-4 py-2 leading-7 whitespace-nowrap rounded bg-primary text-foreground cursor-pointer transition-colors duration-300 hover:bg-secondary"
+      className="cursor-none outline-none border-none px-4 py-2 leading-7 whitespace-nowrap rounded bg-primary text-foreground transition-colors duration-300 hover:bg-secondary"
     >
       {win ? 'Continue' : 'Retry'}
     </button>

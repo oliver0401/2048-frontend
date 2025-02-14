@@ -25,7 +25,7 @@ const Switch: FC<SwitchProps> = ({
       </div>
     )}
     <div
-      className="relative w-10 h-5 leading-5 align-middle rounded-2xl overflow-hidden cursor-pointer"
+      className="relative w-10 h-5 leading-5 align-middle rounded-2xl overflow-hidden"
       onClick={() => onChange(checked ? inactiveValue : activeValue)}
     >
       <input

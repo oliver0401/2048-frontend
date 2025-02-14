@@ -19,7 +19,7 @@ export const WalletContainer: React.FC = () => {
         <FaArrowLeft
           size={32}
           onClick={() => navigate(PATH.ADDRESS)}
-          className="cursor-pointer border-2 border-primary/60 dark:border-primary-dark/60 text-primary/60 dark:text-primary-dark/60 hover:border-primary hover:dark:border-primary-dark hover:text-primary hover:dark:text-primary-dark transition-all rounded-full p-1"
+          className="border-2 border-primary/60 dark:border-primary-dark/60 text-primary/60 dark:text-primary-dark/60 hover:border-primary hover:dark:border-primary-dark hover:text-primary hover:dark:text-primary-dark transition-all rounded-full p-1"
         />
       </div>
       <Text

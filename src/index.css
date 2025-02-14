@@ -25,9 +25,7 @@ html, body, #game {
 * {
     margin: 0;
     padding: 0;
-}
-.custom-cursor {
-  cursor: url('./assets/img/hammer.png'), auto; /* Fallback to default cursor */
+    cursor: none;
 }
 
 @keyframes pop {

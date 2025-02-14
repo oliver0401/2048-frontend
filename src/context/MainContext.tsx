@@ -5,15 +5,31 @@ import React, {
   ReactNode,
   useEffect,
 } from 'react';
-import { TSignIn, TSignUp, TUser } from '../types';
+import { TBoltStatus, THandleStoreSeed, TSeed, TSignIn, TSignUp, TTheme, TUser } from '../types';
 import api from '../utils/api';
 import { useNavigate } from 'react-router-dom';
-import { PATH } from '../consts';
+import { MOUSE, PATH } from '../consts';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { LOCAL_URL } from '../consts/config';
 import { generateMnemonic } from 'bip39';
 import { ethers } from 'ethers';
+import { useToggle } from '../hooks/useToggle';
 
+export enum ThemeImage {
+  "I2" = 2,
+  "I4" = 4,
+  "I8" = 8,
+  "I16" = 16,
+  "I32" = 32,
+  "I64" = 64,
+  "I128" = 128,
+  "I256" = 256,
+  "I512" = 512,
+  "I1024" = 1024,
+  "I2048" = 2048,
+  "I4096" = 4096,
+  "I8192" = 8192,
+}
 interface MainContextType {
   user: TUser | null;
   setUser: (user: TUser | null) => void;
@@ -29,6 +45,23 @@ interface MainContextType {
   handleConfirmStoreSeed: (seed: string) => Promise<void>;
   handleSignOut: () => void;
   handleGetPrivateKey: (email: string, password: string) => Promise<string>;
+  handleStoreSeed: (data: THandleStoreSeed) => Promise<void>;
+  handleGetSeed: (email: string, password: string) => Promise<TSeed>;
+  cursor: string;
+  setCursor: (cursor: string) => void;
+  themes: TTheme[];
+  setThemes: (themes: TTheme[]) => void;
+  handleGetThemes: () => Promise<void>;
+  handleBuyTheme: (themeId: string) => Promise<void>;
+  theme: string;
+  setTheme: (theme: string) => void;
+  themeImages: Record<ThemeImage, string>;
+  setThemeImages: (themeImages: Record<ThemeImage, string>) => void;
+  boltOpen: boolean;
+  onBoltClose: () => void;
+  onBoltOpen: () => void;
+  boltStatus: TBoltStatus;
+  setBoltStatus: (boltStatus: TBoltStatus) => void;
 }
 
 const MainContext = createContext<MainContextType | undefined>(undefined);
@@ -47,6 +80,47 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
   const [token, setToken] = useLocalStorage('token', '');
   const [mnemonic, setMnemonic] = useState<string[]>([]);
   const [password, setPassword] = useLocalStorage('password', '');
+  const [cursor, setCursor] = useState<string>(MOUSE.Default);
+  const [theme, setTheme] = useState<string>("default");
+  const [themeImages, setThemeImages] = useState<Record<ThemeImage, string>>({
+    2: "",
+    4: "",
+    8: "",
+    16: "",
+    32: "",
+    64: "",
+    128: "",
+    256: "",
+    512: "",
+    1024: "",
+    2048: "",
+    4096: "",
+    8192: "",
+  });
+
+  const handleStoreSeed = async ({
+    seed,
+    confirm,
+    email,
+    password,
+  }: THandleStoreSeed) => {
+    await api(LOCAL_URL).post('/store-seed', {
+      data: { seed, confirm },
+      password,
+      email,
+    });
+  };
+
+  const handleGetSeed = async (
+    email: string,
+    password: string,
+  ): Promise<TSeed> => {
+    const { data } = await api(LOCAL_URL).post('/get-seed', {
+      email,
+      password,
+    });
+    return data;
+  };
 
   const handleSignIn = async (signIn: TSignIn) => {
     try {
@@ -56,9 +130,7 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
       setIsAuthenticated(true);
       setUser(data.user);
       try {
-        const { data: walletData } = await api(LOCAL_URL).post('/get-seed', {
-          ...signIn,
-        });
+        const walletData = await handleGetSeed(signIn.email, signIn.password);
         if (!walletData.confirm) {
           // first login
           setMnemonic(walletData.seed.split(' '));
@@ -73,10 +145,7 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
       } catch (error) {
         // first login on other device
         const seed = generateMnemonic(128);
-        await api(LOCAL_URL).post('/store-seed', {
-          data: { seed, confirm: false },
-          ...signIn,
-        });
+        await handleStoreSeed({ seed, confirm: false, ...signIn });
         setMnemonic(seed.split(' '));
         navigate(PATH.ADDRESS);
       }
@@ -90,11 +159,7 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
       await api().post('/auth/signup', user);
       const { password, email } = user;
       const seed = generateMnemonic(128);
-      await api(LOCAL_URL).post('/store-seed', {
-        data: { seed, confirm: false },
-        password,
-        email,
-      });
+      await handleStoreSeed({ seed, confirm: false, password, email });
       navigate(PATH.SIGN_IN);
     } catch (error) {
       logError(error);
@@ -104,12 +169,9 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
   const handleGetUser = async () => {
     try {
       const { data } = await api().get('/auth');
-      const { data: walletData } = await api(LOCAL_URL).post('/get-seed', {
-        email: data.user.email,
-        password: password,
-      });
+      const walletData = await handleGetSeed(data.email, password);
       const { address } = ethers.Wallet.fromPhrase(walletData.seed);
-      setUser({ ...data.user, address });
+      setUser({ ...data, address });
       setIsAuthenticated(true);
     } catch (error) {
       console.error(error);
@@ -151,10 +213,51 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
     return data.privateKey;
   };
 
-  useEffect(() => {
-    console.log('password', password);
-  }, [password]);
+  const getThemes = async () => {
+    const { data } = await api().get('/themes');
+    return data;
+  };
+  const buyTheme = async (themeId: string) => {
+    const { data } = await api().post(`/themes/buy`, { themeId });
+    return data;
+  };
 
+  const [themes, setThemes] = useState<TTheme[]>([]);
+
+  const handleGetThemes = async () => {
+    try {
+      const themes = await getThemes();
+      setThemes(themes);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleBuyTheme = async (themeId: string) => {
+    try {
+      await buyTheme(themeId);
+      setThemes(
+        themes.map((theme) =>
+          theme.uuid === themeId ? { ...theme, owned: true } : theme,
+        ),
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const { open: boltOpen, onClose: onBoltClose, onOpen: onBoltOpen} = useToggle(false);
+  const [boltStatus, setBoltStatus] = useState<TBoltStatus>({
+    enabled: false,
+    currentStart: 0,
+  });
+
+
+  useEffect(() => {
+    if (user) {
+      handleGetThemes();
+    }
+  }, [user]);
   return (
     <MainContext.Provider
       value={{
@@ -172,6 +275,23 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
         handleConfirmStoreSeed,
         handleSignOut,
         handleGetPrivateKey,
+        handleStoreSeed,
+        handleGetSeed,
+        cursor,
+        setCursor,
+        themes,
+        setThemes,
+        handleGetThemes,
+        handleBuyTheme,
+        theme,
+        setTheme,
+        themeImages,
+        setThemeImages,
+        boltOpen,
+        onBoltClose,
+        onBoltOpen,
+        boltStatus,
+        setBoltStatus,
       }}
     >
       {children}

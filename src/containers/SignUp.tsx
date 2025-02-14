@@ -107,7 +107,7 @@ export const SignUpContainer: React.FC = () => {
           as="label"
           fontSize={18}
           color="tile64"
-          className="cursor-pointer"
+          className=""
           onClick={() => navigate(PATH.SIGN_IN)}
         >
           Sign In

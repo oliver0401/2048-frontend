@@ -52,13 +52,17 @@ const Button: React.FC<ButtonProps> = ({
         ${width || ''}
         outline-none
         rounded
-        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-500/80 dark:hover:bg-secondary-dark'}
+        cursor-none
+        ${
+          disabled
+            ? 'opacity-50'
+            : 'hover:bg-gray-500/80 dark:hover:bg-secondary-dark'
+        }
         text-foreground dark:text-foreground-dark
         transition-colors duration-300
         disabled:opacity-50
         ${colorClasses[color]}
         ${className}
-
       `}
       {...props}
     >

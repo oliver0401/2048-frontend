@@ -33,6 +33,7 @@ export type GameBoardParams = {
   cols: number;
   gameState: GameState;
   addScore: (score: number) => void;
+  addCount: () => void;
   initialTiles?: Tile[];
   initialGrid?: Cell[][];
 };
@@ -178,17 +179,25 @@ const moveInDirection = (grid: Cell[][], dir: Vector) => {
         const currentTile = newGrid[currRow][currCol];
         // If the tile has been moved
         if (currRow !== row || currCol !== col) {
+          const canMerge = currentTile?.value === tile.value && !currentTile?.canMerge;
           const updatedTile = {
             ...tile,
             r: currRow,
             c: currCol,
-            canMerge: tile.value === currentTile?.value,
+            canMerge: canMerge,
             isNew: false,
             isMerging: false,
           };
+          
+          if (canMerge) {
+            // Mark the current tile as to be merged
+            currentTile.canMerge = true;
+          }
+          
           newGrid[currRow][currCol] = updatedTile;
           newGrid[row][col] = undefined;
           tiles.push(updatedTile);
+          console.log("updatedTile", updatedTile);
           moveStack.push(updatedTile.index);
         } else if (currentTile != null) {
           tiles.push({ ...currentTile, isNew: false, isMerging: false });
@@ -227,7 +236,7 @@ const resetGameBoard = (rows: number, cols: number) => {
   };
 };
 
-const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGrid }: GameBoardParams) => {
+const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGrid, addCount }: GameBoardParams) => {
   const gridMapRef = useLazyRef(() => {
     let grid: Cell[][];
     let tiles: Tile[];
@@ -252,12 +261,18 @@ const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGr
 
   const onMove = useCallback(
     (dir: Vector) => {
+      console.log("pendingStackRef.current", pendingStackRef.current);
+      console.log("pauseRef.current", pauseRef.current);
       if (pendingStackRef.current.length === 0 && !pauseRef.current) {
+        console.log("move", dir);
+        console.log("gridMapRef.current.grid", gridMapRef.current.grid);
         const {
           tiles: newTiles,
           moveStack,
           grid,
         } = moveInDirection(gridMapRef.current.grid, dir);
+        console.log("grid", grid);
+        console.log("moveStack", moveStack);
         gridMapRef.current = { grid, tiles: newTiles };
         pendingStackRef.current = moveStack;
 
@@ -265,13 +280,17 @@ const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGr
         if (moveStack.length > 0) {
           setTiles(sortTiles(newTiles));
         }
+      } else {
+        pendingStackRef.current = [];
       }
     },
     [gridMapRef],
   );
 
   const onMovePending = useCallback(() => {
+    console.log('Move pending before pop:', [...pendingStackRef.current]);
     pendingStackRef.current.pop();
+    console.log('Move pending after pop:', [...pendingStackRef.current]);
     if (pendingStackRef.current.length === 0) {
       const {
         tiles: newTiles,
@@ -279,10 +298,13 @@ const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGr
         grid,
       } = mergeAndCreateNewTiles(gridMapRef.current.grid);
       gridMapRef.current = { grid, tiles: newTiles };
+      console.log("gridMapRef.current", gridMapRef.current);
       addScore(score);
+      addCount();
       pendingStackRef.current = newTiles
         .filter((tile) => tile.isMerging || tile.isNew)
         .map((tile) => tile.index);
+      console.log('New pending stack:', [...pendingStackRef.current]);
       setTiles(sortTiles(newTiles));
     }
   }, [addScore, gridMapRef]);
@@ -290,6 +312,28 @@ const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGr
   const onMergePending = useCallback(() => {
     pendingStackRef.current.pop();
   }, []);
+
+  const breakTile = useCallback((tile: Location) => {
+    if(pendingStackRef.current.length > 0) {
+      return;
+    }
+    const { r, c } = tile;
+    const newGrid = gridMapRef.current.grid.map(row => [...row]);
+    const value = gridMapRef.current.grid[r][c]?.value;
+
+    // Check if the tile exists before breaking it
+    if (value !== undefined) {
+      newGrid[r][c] = undefined;
+
+      // Update tiles array to remove the broken tile
+      const updatedTiles = gridMapRef.current.tiles.filter(t => t.r !== r || t.c !== c);
+      gridMapRef.current = { grid: newGrid, tiles: updatedTiles };
+      setTiles(sortTiles(updatedTiles));
+
+      // Reduce score when a tile is broken
+      addScore((value * 2 - 2) * -1); // Breaking a tile reduces the score by its value
+    }
+  }, [gridMapRef, addScore]);
 
   if (pauseRef.current !== gameState.pause) {
     pauseRef.current = gameState.pause;
@@ -308,6 +352,7 @@ const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGr
     onMove,
     onMovePending,
     onMergePending,
+    breakTile
   };
 };
 

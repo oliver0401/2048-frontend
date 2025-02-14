@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
+import { useMainContext } from '../../context/MainContext';
 
 export interface ScoreBoardProps {
   title: string;
@@ -8,6 +9,7 @@ export interface ScoreBoardProps {
 const ScoreBoard: FC<ScoreBoardProps> = ({ total, title }) => {
   const totalRef = useRef(total);
   const [score, setScore] = useState(() => total - totalRef.current);
+  const { boltStatus } = useMainContext();
 
   useEffect(() => {
     setScore(total - totalRef.current);
@@ -22,8 +24,8 @@ const ScoreBoard: FC<ScoreBoardProps> = ({ total, title }) => {
       <span className="text-lg font-bold text-foreground dark:text-foreground-dark">
         {total}
       </span>
-      {score > 0 && (
-        <div 
+      {score !== 0 && (
+        <div
           key={total}
           className="
             absolute left-0 bottom-[10px] w-full 
@@ -32,8 +34,16 @@ const ScoreBoard: FC<ScoreBoardProps> = ({ total, title }) => {
             animate-fade-out
           "
         >
-          <span className="text-lg font-bold text-primary dark:text-primary-dark">
-            +{score}
+          <span
+            className={` ${
+              boltStatus.enabled && title === "score"
+                ? 'text-5xl text-blue-500 font-extrabold'
+                : score > 0
+                ? 'text-lg text-primary dark:text-primary-dark font-bold'
+                : 'text-4xl text-tile-64 dark:text-tile-64-dark font-bold'
+            } `}
+          >
+            {score > 0 ? `+${score}` : `${score}`}
           </span>
         </div>
       )}
