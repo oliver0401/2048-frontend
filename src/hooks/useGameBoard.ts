@@ -197,7 +197,6 @@ const moveInDirection = (grid: Cell[][], dir: Vector) => {
           newGrid[currRow][currCol] = updatedTile;
           newGrid[row][col] = undefined;
           tiles.push(updatedTile);
-          console.log("updatedTile", updatedTile);
           moveStack.push(updatedTile.index);
         } else if (currentTile != null) {
           tiles.push({ ...currentTile, isNew: false, isMerging: false });
@@ -261,18 +260,12 @@ const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGr
 
   const onMove = useCallback(
     (dir: Vector) => {
-      console.log("pendingStackRef.current", pendingStackRef.current);
-      console.log("pauseRef.current", pauseRef.current);
       if (pendingStackRef.current.length === 0 && !pauseRef.current) {
-        console.log("move", dir);
-        console.log("gridMapRef.current.grid", gridMapRef.current.grid);
         const {
           tiles: newTiles,
           moveStack,
           grid,
         } = moveInDirection(gridMapRef.current.grid, dir);
-        console.log("grid", grid);
-        console.log("moveStack", moveStack);
         gridMapRef.current = { grid, tiles: newTiles };
         pendingStackRef.current = moveStack;
 
@@ -288,9 +281,7 @@ const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGr
   );
 
   const onMovePending = useCallback(() => {
-    console.log('Move pending before pop:', [...pendingStackRef.current]);
     pendingStackRef.current.pop();
-    console.log('Move pending after pop:', [...pendingStackRef.current]);
     if (pendingStackRef.current.length === 0) {
       const {
         tiles: newTiles,
@@ -298,13 +289,11 @@ const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGr
         grid,
       } = mergeAndCreateNewTiles(gridMapRef.current.grid);
       gridMapRef.current = { grid, tiles: newTiles };
-      console.log("gridMapRef.current", gridMapRef.current);
       addScore(score);
       addCount();
       pendingStackRef.current = newTiles
         .filter((tile) => tile.isMerging || tile.isNew)
         .map((tile) => tile.index);
-      console.log('New pending stack:', [...pendingStackRef.current]);
       setTiles(sortTiles(newTiles));
     }
   }, [addScore, gridMapRef]);
