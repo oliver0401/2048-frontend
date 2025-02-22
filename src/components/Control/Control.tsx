@@ -1,15 +1,17 @@
 import React, { FC } from 'react';
-import { MAX_SCALE, MIN_SCALE } from '../../utils/constants';
-import Box from '../Box';
+import { MIN_SCALE } from '../../utils/constants';
 import Button from '../Button';
 import Text from '../Text';
+import { IoGameControllerOutline } from 'react-icons/io5';
 
-export interface ControlProps {
+interface ControlProps {
   rows: number;
   cols: number;
   onReset: () => void;
-  onChangeRow: (newRow: number) => void;
-  onChangeCol: (newCol: number) => void;
+  onChangeRow: (delta: number) => void;
+  onChangeCol: (delta: number) => void;
+  maxScaleRows: number;
+  maxScaleCols: number;
 }
 
 const Control: FC<ControlProps> = ({
@@ -18,68 +20,71 @@ const Control: FC<ControlProps> = ({
   onReset,
   onChangeRow,
   onChangeCol,
+  maxScaleRows,
+  maxScaleCols,
 }) => (
-  <Box inlineSize="100%" justifyContent="space-between">
+  <div className="w-full flex justify-between">
     <Button onClick={onReset}>
-      <Text fontSize={16} textTransform="capitalize">
+      <Text fontSize={16} textTransform="capitalize" className="flex items-center gap-2">
+        <IoGameControllerOutline size={20} />
         new game
       </Text>
     </Button>
-    <Box>
-      <Box marginInlineEnd="s6" flexDirection="column">
+    <div className="flex">
+      <div className="mr-6 flex flex-col items-center">
         <Text textTransform="uppercase" fontSize={13} color="primary">
           rows
         </Text>
-        <Box padding="s2">
+        <div className="px-2 flex items-center">
           <Button
             mini
             onClick={() => onChangeRow(-1)}
-            disable={rows === MIN_SCALE}
+            disabled={rows === MIN_SCALE}
           >
             -
           </Button>
-          <Box marginInline="s3">
+          <div className="mx-3">
             <Text fontSize={16} color="primary">
               {rows}
             </Text>
-          </Box>
+          </div>
           <Button
             mini
             onClick={() => onChangeRow(1)}
-            disable={rows === MAX_SCALE}
+            disabled={rows === maxScaleRows}
           >
             +
           </Button>
-        </Box>
-      </Box>
-      <Box flexDirection="column">
+        </div>
+      </div>
+      <div className="flex flex-col items-center">
         <Text textTransform="uppercase" fontSize={13} color="primary">
           cols
         </Text>
-        <Box padding="s2">
+        <div className="px-2 flex items-center">
           <Button
             mini
             onClick={() => onChangeCol(-1)}
-            disable={cols === MIN_SCALE}
+            disabled={cols === MIN_SCALE}
           >
             -
           </Button>
-          <Box marginInline="s3">
+          <div className="mx-3">
             <Text fontSize={16} color="primary">
               {cols}
             </Text>
-          </Box>
+          </div>
           <Button
             mini
             onClick={() => onChangeCol(1)}
-            disable={cols === MAX_SCALE}
+            disabled={cols === maxScaleCols}
           >
             +
           </Button>
-        </Box>
-      </Box>
-    </Box>
-  </Box>
+        </div>
+      </div>
+    </div>
+  </div>
 );
 
-export default React.memo(Control);
+export default Control;

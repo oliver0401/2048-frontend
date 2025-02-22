@@ -1,9 +1,4 @@
 import React, { FC } from 'react';
-import StyledBackdrop from './StyledBackdrop';
-import StyledModal from './StyledModal';
-import Button from '../Button';
-import Box from '../Box';
-import Text from '../Text';
 
 export interface NotificationProps {
   win: boolean;
@@ -11,15 +6,20 @@ export interface NotificationProps {
 }
 
 const Notification: FC<NotificationProps> = ({ win, onClose }) => (
-  <StyledModal>
-    <StyledBackdrop />
-    <Box paddingBlock="s5" background="transparent">
-      <Text fontSize={22} color="primary">
+  <div className="absolute inset-0 flex flex-col items-center justify-center bg-none z-20 animate-expand rounded overflow-hidden">
+    <div className="absolute inset-0 bg-backdrop opacity-70 -z-10" />
+    <div className="py-5 bg-transparent">
+      <span className="text-[22px] text-primary">
         {win ? 'You win! Continue?' : 'Oops...Game Over!'}
-      </Text>
-    </Box>
-    <Button onClick={onClose}>{win ? 'Continue' : 'Retry'}</Button>
-  </StyledModal>
+      </span>
+    </div>
+    <button
+      onClick={onClose}
+      className="outline-none border-none px-4 py-2 leading-7 whitespace-nowrap rounded bg-primary text-foreground transition-colors duration-300 hover:bg-secondary"
+    >
+      {win ? 'Continue' : 'Retry'}
+    </button>
+  </div>
 );
 
 export default Notification;

@@ -7,7 +7,11 @@ const useLocalStorage = <T>(
   const getValue = (): T => {
     try {
       const item = window.localStorage.getItem(name);
-      return item != null ? JSON.parse(item) : initialValue;
+      try {
+        return item != null ? JSON.parse(item) : initialValue;
+      } catch {
+        return item != null ? (item as T) : initialValue;
+      }
     } catch (error: any) {
       // eslint-disable-next-line no-console
       console.error(
@@ -23,7 +27,10 @@ const useLocalStorage = <T>(
   const setValue = useCallback(
     (newValue: T) => {
       try {
-        window.localStorage.setItem(name, JSON.stringify(newValue));
+        window.localStorage.setItem(
+          name,
+          typeof newValue === 'string' ? newValue : JSON.stringify(newValue),
+        );
         setStoredValue(newValue);
       } catch (error: any) {
         // eslint-disable-next-line no-console

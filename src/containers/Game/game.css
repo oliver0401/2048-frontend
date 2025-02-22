@@ -1,0 +1,17 @@
+@keyframes fadeOut {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    75% {
+        transform: translateY(-25px);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+}
+.bolt-fade-out {
+    animation: fadeOut 1s forwards;
+}

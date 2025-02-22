@@ -1,11 +1,10 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import useArrowKeyPress from '../../hooks/useArrowKeyPress';
-import type { Tile } from '../../hooks/useGameBoard';
+import type { Location, Tile } from '../../hooks/useGameBoard';
 import type { GameStatus } from '../../hooks/useGameState';
 import useSwipe from '../../hooks/useSwipe';
 import { calcLocation, calcTileSize } from '../../utils/common';
 import { Vector } from '../../utils/types';
-import Box from '../Box';
 import Grid from '../Grid';
 import Notification from '../Notification';
 import TileComponent from '../Tile';
@@ -21,6 +20,8 @@ export interface GameBoardProps {
   onMovePending: () => void;
   onMergePending: () => void;
   onCloseNotification: (currentStatus: GameStatus) => void;
+  breakTile: (tile: Location) => void;
+  x2Tile: (tile: Location) => void;
 }
 
 const GameBoard: FC<GameBoardProps> = ({
@@ -34,6 +35,8 @@ const GameBoard: FC<GameBoardProps> = ({
   onMovePending,
   onMergePending,
   onCloseNotification,
+  breakTile,
+  x2Tile,
 }) => {
   const [{ width: tileWidth, height: tileHeight }, setTileSize] = useState(() =>
     calcTileSize(boardSize, rows, cols, spacing),
@@ -47,7 +50,7 @@ const GameBoard: FC<GameBoardProps> = ({
   }, [boardSize, cols, rows, spacing]);
 
   return (
-    <Box position="relative" ref={boardRef}>
+    <div className="relative" ref={boardRef}>
       <Grid
         width={boardSize}
         height={boardSize}
@@ -55,13 +58,8 @@ const GameBoard: FC<GameBoardProps> = ({
         cols={cols}
         spacing={spacing}
       />
-      <Box
-        position="absolute"
-        top={0}
-        left={0}
-        background="transparent"
-        blockSize="100%"
-        inlineSize="100%"
+      <div
+        className="absolute top-0 left-0 bg-transparent w-full h-full"
         onTransitionEnd={onMovePending}
         onAnimationEnd={onMergePending}
       >
@@ -75,17 +73,19 @@ const GameBoard: FC<GameBoardProps> = ({
             value={value}
             isNew={isNew}
             isMerging={isMerging}
+            breakTile={breakTile}
+            x2Tile={x2Tile}
           />
         ))}
-      </Box>
+      </div>
       {(gameStatus === 'win' || gameStatus === 'lost') && (
         <Notification
           win={gameStatus === 'win'}
           onClose={() => onCloseNotification(gameStatus)}
         />
       )}
-    </Box>
+    </div>
   );
 };
 
-export default React.memo(GameBoard);
+export default GameBoard;

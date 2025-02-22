@@ -1,27 +1,21 @@
-import { useReducer } from 'react';
-import { Theme, ThemeName } from '../themes/types';
-import defaultTheme from '../themes/default';
-import darkTheme from '../themes/dark';
+import { useCallback, useEffect, useState } from 'react';
+import { ThemeName } from '../themes/types';
 
-export type ThemeEntity = {
-  name: ThemeName;
-  value: Theme;
-};
+export default function useTheme(initialTheme: ThemeName = ThemeName.DEFAULT) {
+  const [theme, setTheme] = useState({ name: initialTheme });
 
-const isThemeName = (t: string): t is ThemeName =>
-  t === 'default' || t === 'dark';
+  const updateTheme = useCallback((name: ThemeName) => {
+    if (name === ThemeName.DARK) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    setTheme({ name });
+  }, []);
 
-const getTheme = (name: ThemeName): ThemeEntity =>
-  name === 'default'
-    ? { name: 'default', value: defaultTheme }
-    : { name: 'dark', value: darkTheme };
+  useEffect(() => {
+    updateTheme(initialTheme);
+  }, [initialTheme, updateTheme]);
 
-const themeReducer = (theme: ThemeEntity, nextThemeName: string) =>
-  isThemeName(nextThemeName) ? getTheme(nextThemeName) : theme;
-
-const useTheme = (
-  initialThemeName: ThemeName,
-): [ThemeEntity, (nextTheme: string) => void] =>
-  useReducer(themeReducer, initialThemeName, getTheme);
-
-export default useTheme;
+  return [theme, updateTheme] as const;
+}

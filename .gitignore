@@ -47,7 +47,7 @@ Temporary Items
 **/npm_modules/
 **/node_modules/
 **/bower_components/
-
+release/
 # vscode config
 **/.vscode/
 

@@ -1,0 +1,14 @@
+/* .fixed {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.fixed.in {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.fixed.out {
+  opacity: 0;
+  transform: scale(0.9);
+}  */

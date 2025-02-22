@@ -40,4 +40,7 @@ export interface Theme {
   palette: Palette;
 }
 
-export type ThemeName = 'default' | 'dark';
+export enum ThemeName {
+  DEFAULT = 'default',
+  DARK = 'dark',
+}
