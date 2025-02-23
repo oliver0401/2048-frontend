@@ -17,8 +17,20 @@ const ScoreBoard: FC<ScoreBoardProps> = ({ total, title }) => {
   }, [total]);
 
   return (
-    <div className="mx-2 py-3 w-[92px] bg-secondary dark:bg-secondary-dark flex flex-col relative justify-center items-center box-border rounded-md">
-      <span className="text-xs uppercase font-bold text-tertiary dark:text-tertiary-dark">
+    <div
+      className={`mx-2 py-3 w-[92px] ${
+        boltStatus.enabled && title === 'score'
+          ? 'bg-blue-600'
+          : 'bg-secondary dark:bg-secondary-dark'
+      } flex flex-col relative justify-center items-center box-border rounded-md`}
+    >
+      <span
+        className={`text-xs uppercase font-bold ${
+          boltStatus.enabled && title === 'score'
+            ? 'text-foreground dark:text-foreground-dark'
+            : 'text-tertiary dark:text-tertiary-dark'
+        }`}
+      >
         {title}
       </span>
       <span className="text-lg font-bold text-foreground dark:text-foreground-dark">
@@ -36,8 +48,8 @@ const ScoreBoard: FC<ScoreBoardProps> = ({ total, title }) => {
         >
           <span
             className={` ${
-              boltStatus.enabled && title === "score"
-                ? 'text-5xl text-blue-500 font-extrabold'
+              boltStatus.enabled && title === 'score'
+                ? 'text-5xl text-white font-extrabold'
                 : score > 0
                 ? 'text-lg text-primary dark:text-primary-dark font-bold'
                 : 'text-4xl text-tile-64 dark:text-tile-64-dark font-bold'

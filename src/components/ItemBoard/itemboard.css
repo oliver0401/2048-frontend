@@ -1,0 +1,8 @@
+.itemboard-fade-out {
+    animation: item-fade-out 0.3s ease-in-out;
+}
+
+@keyframes item-fade-out {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-100px); }
+}

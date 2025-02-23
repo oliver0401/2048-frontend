@@ -8,35 +8,44 @@ import ItemsTab from './components/ItemsTab'; // Import the new ItemsTab compone
 import BorderSizeTab from './components/BorderSizeTab'; // Import the new BorderSizeTab component
 import ThemeTab from './components/ThemeTab'; // Import the new ThemeTab component
 import { useNavigate } from 'react-router-dom';
+import Modal from '../../components/Modal';
+import Text from '../../components/Text';
+import CheckoutForm from './components/CheckoutForm';
 
 export const ShopContainer: React.FC = () => {
-  // State for token balance
-  const [tokenBalance, setTokenBalance] = useState(100); // Example initial balance
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<{
+    name: string;
+    price: number;
+    type: 'item' | 'theme' | 'border';
+    id?: string;
+  } | null>(null);
   const { user } = useMainContext();
   const navigate = useNavigate();
 
-  const handlePurchase = (price: number) => {
-    if (tokenBalance >= price) {
-      setTokenBalance(tokenBalance - price);
-      alert('Purchase successful!');
-    } else {
-      alert('Not enough tokens!');
-    }
+  const handlePurchase = (item: {
+    name: string;
+    price: number;
+    type: 'item' | 'theme' | 'border';
+    id?: string;
+  }) => {
+    setSelectedItem(item);
+    setIsModalOpen(true);
   };
 
   const tabs = useMemo(
     () => [
       {
         label: 'Items',
-        content: <ItemsTab handlePurchase={handlePurchase} />, // Use ItemsTab component
+        content: <ItemsTab handlePurchase={handlePurchase} />,
       },
       {
         label: 'Border Size',
-        content: <BorderSizeTab user={user} />, // Use BorderSizeTab component
+        content: <BorderSizeTab user={user} handlePurchase={handlePurchase} />,
       },
       {
         label: 'Theme',
-        content: <ThemeTab />, // Use ThemeTab component
+        content: <ThemeTab handlePurchase={handlePurchase} />,
       },
     ],
     [user],
@@ -55,6 +64,29 @@ export const ShopContainer: React.FC = () => {
         />
         Return to Game
       </Button>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Purchase">
+        <div className="w-full flex flex-col gap-4">
+          {selectedItem && (
+            <>
+              <Text as="h2" color="tile32" fontSize={24} className="font-semibold">
+                Purchase {selectedItem.name}
+              </Text>
+              <Text color="primary" fontSize={16}>
+                Price: ${selectedItem.price / 100}
+              </Text>
+              <CheckoutForm
+                amount={selectedItem.price}
+                itemType={selectedItem.type}
+                itemId={selectedItem.id}
+                onSuccess={() => {
+                  setIsModalOpen(false);
+                  setSelectedItem(null);
+                }}
+              />
+            </>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 };

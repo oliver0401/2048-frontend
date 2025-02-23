@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { MIN_SCALE } from '../../utils/constants';
 import Button from '../Button';
 import Text from '../Text';
+import { IoGameControllerOutline } from 'react-icons/io5';
 
 interface ControlProps {
   rows: number;
@@ -24,7 +25,8 @@ const Control: FC<ControlProps> = ({
 }) => (
   <div className="w-full flex justify-between">
     <Button onClick={onReset}>
-      <Text fontSize={16} textTransform="capitalize">
+      <Text fontSize={16} textTransform="capitalize" className="flex items-center gap-2">
+        <IoGameControllerOutline size={20} />
         new game
       </Text>
     </Button>

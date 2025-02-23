@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 interface Tab {
-  label: string;
+  label: React.ReactNode;
   content: React.ReactNode;
 }
 
@@ -16,24 +16,23 @@ const Tabs: React.FC<TabsProps> = ({ tabs }) => {
     <div className="flex flex-col items-center justify-start w-full gap-3">
       {/* Tab Navigation */}
       <div className="flex mb-4 w-full">
-        {tabs.map((tab) => (
+        {tabs.map((tab, idx) => (
           <button
-            key={tab.label}
-            className={`cursor-none p-2 text-primary-dark dark:text-primary-dark ${activeTab === tab.label ? 'font-bold border-b-2 border-primary-dark dark:border-primary-dark' : ''}`}
+            key={idx}
+            className={`p-2 text-primary-dark dark:text-primary-dark text-center ${activeTab === tab.label ? 'font-bold border-b-2 border-primary-dark dark:border-primary-dark' : ''}`}
             style={{width: `${100 / tabs.length}%`}}
             onClick={() => setActiveTab(tab.label)}
           >
             {tab.label}
-
           </button>
         ))}
       </div>
 
       {/* Tab Content with Sliding Effect */}
       <div className="tab-content w-full">
-        {tabs.map((tab) => (
+        {tabs.map((tab, idx) => (
           activeTab === tab.label && (
-            <div key={tab.label} className="slide-in w-full">
+            <div key={idx} className="slide-in w-full">
               {tab.content}
             </div>
           )

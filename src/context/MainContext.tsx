@@ -5,7 +5,16 @@ import React, {
   ReactNode,
   useEffect,
 } from 'react';
-import { TBoltStatus, THandleStoreSeed, TSeed, TSignIn, TSignUp, TTheme, TUser } from '../types';
+import {
+  TBoltStatus,
+  THandleStoreSeed,
+  TSeed,
+  TSignIn,
+  TSignUp,
+  TTheme,
+  TTileImg,
+  TUser,
+} from '../types';
 import api from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 import { MOUSE, PATH } from '../consts';
@@ -16,19 +25,19 @@ import { ethers } from 'ethers';
 import { useToggle } from '../hooks/useToggle';
 
 export enum ThemeImage {
-  "I2" = 2,
-  "I4" = 4,
-  "I8" = 8,
-  "I16" = 16,
-  "I32" = 32,
-  "I64" = 64,
-  "I128" = 128,
-  "I256" = 256,
-  "I512" = 512,
-  "I1024" = 1024,
-  "I2048" = 2048,
-  "I4096" = 4096,
-  "I8192" = 8192,
+  'I2' = 2,
+  'I4' = 4,
+  'I8' = 8,
+  'I16' = 16,
+  'I32' = 32,
+  'I64' = 64,
+  'I128' = 128,
+  'I256' = 256,
+  'I512' = 512,
+  'I1024' = 1024,
+  'I2048' = 2048,
+  'I4096' = 4096,
+  'I8192' = 8192,
 }
 interface MainContextType {
   user: TUser | null;
@@ -55,13 +64,19 @@ interface MainContextType {
   handleBuyTheme: (themeId: string) => Promise<void>;
   theme: string;
   setTheme: (theme: string) => void;
-  themeImages: Record<ThemeImage, string>;
-  setThemeImages: (themeImages: Record<ThemeImage, string>) => void;
+  themeImages: Record<ThemeImage, TTileImg | undefined>;
+  setThemeImages: (
+    themeImages: Record<ThemeImage, TTileImg | undefined>,
+  ) => void;
   boltOpen: boolean;
   onBoltClose: () => void;
   onBoltOpen: () => void;
   boltStatus: TBoltStatus;
   setBoltStatus: (boltStatus: TBoltStatus) => void;
+  handleUpdateUser: (updateData: Partial<TUser>) => Promise<void>;
+  handleGetMaxTile: () => Promise<any>;
+  handleGetMaxMove: () => Promise<any>;
+  handleGetMaxScore: () => Promise<any>;
 }
 
 const MainContext = createContext<MainContextType | undefined>(undefined);
@@ -81,21 +96,23 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
   const [mnemonic, setMnemonic] = useState<string[]>([]);
   const [password, setPassword] = useLocalStorage('password', '');
   const [cursor, setCursor] = useState<string>(MOUSE.Default);
-  const [theme, setTheme] = useState<string>("default");
-  const [themeImages, setThemeImages] = useState<Record<ThemeImage, string>>({
-    2: "",
-    4: "",
-    8: "",
-    16: "",
-    32: "",
-    64: "",
-    128: "",
-    256: "",
-    512: "",
-    1024: "",
-    2048: "",
-    4096: "",
-    8192: "",
+  const [theme, setTheme] = useState<string>('default');
+  const [themeImages, setThemeImages] = useState<
+    Record<ThemeImage, TTileImg | undefined>
+  >({
+    2: undefined,
+    4: undefined,
+    8: undefined,
+    16: undefined,
+    32: undefined,
+    64: undefined,
+    128: undefined,
+    256: undefined,
+    512: undefined,
+    1024: undefined,
+    2048: undefined,
+    4096: undefined,
+    8192: undefined,
   });
 
   const handleStoreSeed = async ({
@@ -246,13 +263,41 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const { open: boltOpen, onClose: onBoltClose, onOpen: onBoltOpen} = useToggle(false);
+  const {
+    open: boltOpen,
+    onClose: onBoltClose,
+    onOpen: onBoltOpen,
+  } = useToggle(false);
   const [boltStatus, setBoltStatus] = useState<TBoltStatus>({
     enabled: false,
     currentStart: 0,
   });
 
+  const handleUpdateUser = async (updateData: Partial<TUser>) => {
+    try {
+      const { data } = await api().put('/auth', updateData);
+      if (user) {
+        setUser({ ...user, ...data });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
+  const handleGetMaxTile = async () => {
+    const { data } = await api().get('/calc/max-tile');
+    return data;
+  };
+
+  const handleGetMaxMove = async () => {
+    const { data } = await api().get('/calc/max-moves');
+    return data;
+  };
+
+  const handleGetMaxScore = async () => {
+    const { data } = await api().get('/calc/max-score');
+    return data;
+  };
   useEffect(() => {
     if (user) {
       handleGetThemes();
@@ -292,6 +337,10 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
         onBoltOpen,
         boltStatus,
         setBoltStatus,
+        handleUpdateUser,
+        handleGetMaxTile,
+        handleGetMaxMove,
+        handleGetMaxScore,
       }}
     >
       {children}

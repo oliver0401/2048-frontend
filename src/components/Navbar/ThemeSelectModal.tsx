@@ -5,11 +5,11 @@ import { FaCheck } from 'react-icons/fa';
 import { preloadImages } from '../../utils/preloadImg';
 import { CiImageOn } from 'react-icons/ci';
 
-interface ThemeModalProps {
+interface ThemeSelectModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-export const ThemeModal = ({ isOpen, onClose }: ThemeModalProps) => {
+export const ThemeSelectModal = ({ isOpen, onClose }: ThemeSelectModalProps) => {
   const { theme, setTheme, themes, setThemeImages } = useMainContext();
   const [preloading, setPreloading] = useState(false);
   return (
@@ -27,19 +27,19 @@ export const ThemeModal = ({ isOpen, onClose }: ThemeModalProps) => {
             onClick={() => {
               setTheme('default');
               setThemeImages({
-                2: '',
-                4: '',
-                8: '',
-                16: '',
-                32: '',
-                64: '',
-                128: '',
-                256: '',
-                512: '',
-                1024: '',
-                2048: '',
-                4096: '',
-                8192: '',
+                2: undefined,
+                4: undefined,
+                8: undefined,
+                16: undefined,
+                32: undefined,
+                64: undefined,
+                128: undefined,
+                256: undefined,
+                512: undefined,
+                1024: undefined,
+                2048: undefined,
+                4096: undefined,
+                8192: undefined,
               });
             }}
           >
@@ -81,19 +81,19 @@ export const ThemeModal = ({ isOpen, onClose }: ThemeModalProps) => {
                 setPreloading(true);
                 try {
                   await preloadImages([
-                    t[2],
-                    t[4],
-                    t[8],
-                    t[16],
-                    t[32],
-                    t[64],
-                    t[128],
-                    t[256],
-                    t[512],
-                    t[1024],
-                    t[2048],
-                    t[4096],
-                    t[8192],
+                    t[2].sm,
+                    t[4].sm,
+                    t[8].sm,
+                    t[16].sm,
+                    t[32].sm,
+                    t[64].sm,
+                    t[128].sm,
+                    t[256].sm,
+                    t[512].sm,
+                    t[1024].sm,
+                    t[2048].sm,
+                    t[4096].sm,
+                    t[8192].sm,
                   ]);
                 } catch (error) {
                   console.error("Failed to preload images:", error);
@@ -102,7 +102,7 @@ export const ThemeModal = ({ isOpen, onClose }: ThemeModalProps) => {
                 }
               }}
             >
-              <img src={t[2]} alt={t.title} className="max-w-32 max-h-32" />
+              <img src={t[2].sm} alt={t.title} className="max-w-32 max-h-32" />
               {theme === t.uuid && (
                 <FaCheck
                   size={24}

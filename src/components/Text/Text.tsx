@@ -54,7 +54,6 @@ const Text: React.FC<TextProps> = ({
   return (
     <Component
       className={`
-        cursor-none
         ${color ? colorClasses[color as keyof typeof colorClasses] : ''}
         ${textTransform ? `${textTransform}` : ''}
         ${fontWeight ? `font-${fontWeight}` : ''}

@@ -13,7 +13,7 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center backdrop-blur-md transition-opacity duration-300 ease-in-out ${
+      className={`fixed z-40 h-screen w-screen top-0 left-0 inset-0 flex items-center justify-center backdrop-blur-md transition-opacity duration-300 ease-in-out ${
         isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
       onClick={onClose}

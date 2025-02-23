@@ -4,3 +4,7 @@ export * from './Address';
 export * from './SignIn';
 export * from './SignUp';
 export * from './Profile';
+export * from './Leaderboard';
+export * from './WalletRecover';
+export * from './Wallet';
+export * from './Shop';

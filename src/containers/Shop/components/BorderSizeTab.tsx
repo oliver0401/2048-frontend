@@ -2,7 +2,13 @@ import React from 'react';
 import { FaArrowsAltH, FaArrowsAltV } from 'react-icons/fa';
 import { IoDiamondOutline } from 'react-icons/io5';
 
-const BorderSizeTab: React.FC<{ user: any }> = ({ user }) => {
+const BorderSizeTab: React.FC<{ user: any, handlePurchase: (item: {
+  name: string;
+  price: number;
+  type: 'item' | 'theme' | 'border';
+  id?: string;
+}) => void;
+}> = ({ user, handlePurchase }) => {
   return (
     <div className="flex flex-col items-center gap-4 w-full">
       <h2 className="font-semibold text-tile-64 dark:text-tile-128">Border Size Options</h2>
@@ -19,7 +25,11 @@ const BorderSizeTab: React.FC<{ user: any }> = ({ user }) => {
         </div>
         <div className="flex justify-end w-full">
           <button
-            onClick={() => {}}
+            onClick={() => handlePurchase({
+              name: 'Row Expansion',
+              price: 100 * 2 ** user.rows,
+              type: 'border',
+            })}
             className="hover:scale-105 bg-transparent transition-transform max-w-min flex items-center gap-2 text-nowrap font-bold text-primary-dark dark:text-primary-dark border-2 border-primary-dark dark:border-primary-dark rounded-md px-2 py-1"
           >
             Get For: {user?.rows && 100 * 2 ** user.rows}

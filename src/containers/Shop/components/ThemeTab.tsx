@@ -10,7 +10,12 @@ interface ThemeComponentProps {
   image: string;
   uuid: string;
   owned: boolean;
-  handleBuyTheme: (themeId: string) => Promise<void>;
+  handleBuyTheme: (item: {
+    name: string;
+    price: number;
+    type: 'item' | 'theme' | 'border';
+    id?: string;
+  }) => void;
 }
 const ThemeComponent: React.FC<ThemeComponentProps> = ({
   title,
@@ -51,8 +56,13 @@ const ThemeComponent: React.FC<ThemeComponentProps> = ({
         <div className="w-full flex justify-end">
           {!owned && (
             <button
-              onClick={() => handleBuyTheme(uuid)}
-              className="cursor-none hover:scale-105 bg-transparent transition-transform max-w-min flex items-center gap-2 text-nowrap font-bold text-primary dark:text-primary-dark border-2 border-primary dark:border-primary-dark rounded-md px-2 py-1"
+              onClick={() => handleBuyTheme({
+                name: title,
+                price: 100,
+                type: 'theme',
+                id: uuid,
+              })}
+              className="hover:scale-105 bg-transparent transition-transform max-w-min flex items-center gap-2 text-nowrap font-bold text-primary dark:text-primary-dark border-2 border-primary dark:border-primary-dark rounded-md px-2 py-1"
             >
               Get For: 100
               <IoDiamondOutline size={20} />
@@ -63,8 +73,14 @@ const ThemeComponent: React.FC<ThemeComponentProps> = ({
     </div>
   );
 };
-const ThemeTab: React.FC = () => {
-  const { themes, handleBuyTheme } = useThemeTab();
+const ThemeTab: React.FC<{ handlePurchase: (item: {
+  name: string;
+  price: number;
+  type: 'item' | 'theme' | 'border';
+  id?: string;
+}) => void;
+}> = ({ handlePurchase }) => {
+  const { themes } = useThemeTab();
   return (
     <div className="w-full flex flex-col">
       {themes.map((theme) => (
@@ -72,10 +88,10 @@ const ThemeTab: React.FC = () => {
           key={theme.uuid}
           title={theme.title}
           description={theme.description}
-          image={theme[2]}
+          image={theme[2].sm}
           uuid={theme.uuid}
           owned={theme.owned}
-          handleBuyTheme={handleBuyTheme}
+          handleBuyTheme={handlePurchase}
         />
       ))}
     </div>

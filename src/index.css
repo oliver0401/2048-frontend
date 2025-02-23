@@ -25,7 +25,6 @@ html, body, #game {
 * {
     margin: 0;
     padding: 0;
-    cursor: none;
 }
 
 @keyframes pop {
@@ -53,4 +52,35 @@ html, body, #game {
 }
 .animate-expand {
   animation: expand 0.05s forwards;
+}
+
+button {
+  cursor: none;
+}
+/* Webkit scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  cursor: none;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-background dark:bg-background-dark;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary dark:bg-primary-dark rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary-dark dark:bg-primary;
+}
+
+/* Firefox scrollbar styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: theme('colors.primary.DEFAULT') theme('colors.background.DEFAULT');
+}
+
+.dark * {
+  scrollbar-color: theme('colors.primary.dark') theme('colors.background.dark');
 }

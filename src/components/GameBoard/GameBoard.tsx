@@ -21,6 +21,7 @@ export interface GameBoardProps {
   onMergePending: () => void;
   onCloseNotification: (currentStatus: GameStatus) => void;
   breakTile: (tile: Location) => void;
+  x2Tile: (tile: Location) => void;
 }
 
 const GameBoard: FC<GameBoardProps> = ({
@@ -35,6 +36,7 @@ const GameBoard: FC<GameBoardProps> = ({
   onMergePending,
   onCloseNotification,
   breakTile,
+  x2Tile,
 }) => {
   const [{ width: tileWidth, height: tileHeight }, setTileSize] = useState(() =>
     calcTileSize(boardSize, rows, cols, spacing),
@@ -72,6 +74,7 @@ const GameBoard: FC<GameBoardProps> = ({
             isNew={isNew}
             isMerging={isMerging}
             breakTile={breakTile}
+            x2Tile={x2Tile}
           />
         ))}
       </div>

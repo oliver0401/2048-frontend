@@ -86,6 +86,26 @@ module.exports = {
           2048: {
             DEFAULT: '#eecc11',
             dark: '#e0c010'
+          },
+          4096: {
+            DEFAULT: '#eecc44',
+            dark: '#e0c040'
+          },
+          8192: {
+            DEFAULT: '#eecc22',
+            dark: '#e0c020'
+          },
+          16384: {
+            DEFAULT: '#eecc00',
+            dark: '#e0c000'
+          },
+          32768: {
+            DEFAULT: '#eeaa00',
+            dark: '#e0a000'
+          },
+          65536: {
+            DEFAULT: '#ee8800',
+            dark: '#e08000'
           }
         }
       },

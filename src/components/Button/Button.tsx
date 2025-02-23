@@ -52,7 +52,6 @@ const Button: React.FC<ButtonProps> = ({
         ${width || ''}
         outline-none
         rounded
-        cursor-none
         ${
           disabled
             ? 'opacity-50'

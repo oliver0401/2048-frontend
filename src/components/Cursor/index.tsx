@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMainContext } from '../../context/MainContext';
+import { MOUSE } from '../../consts';
 
 const CustomCursor = () => {
   const { cursor } = useMainContext();
@@ -31,7 +32,7 @@ const CustomCursor = () => {
         top: position.y,
         transform: 'translate(0%, 0%)', // Center the cursor
         pointerEvents: 'none', // Prevent the cursor from interfering with clicks
-        zIndex: 9999,
+        zIndex: 99999,
       }}
     >
       <img
@@ -45,9 +46,11 @@ const CustomCursor = () => {
           console.log('mouse up');
           setRotate(false);
         }}
-        className={`min-w-12 min-h-12 max-w-12 max-h-12 ${
-          rotate ? 'rotate-90' : ''
-        }`}
+        className={`${
+          cursor === MOUSE.X2
+            ? 'min-w-[68px] min-h-[68px] max-w-[68px] max-h-[68px]'
+            : 'min-w-12 min-h-12 max-w-12 max-h-12'
+        } ${rotate ? 'rotate-90' : ''}`}
       />
     </div>
   );

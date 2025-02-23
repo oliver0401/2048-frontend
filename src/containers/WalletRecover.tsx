@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { PATH } from '../consts';
 import { useWallet } from '../hooks/useWallet';
 
-export const WalletContainer: React.FC = () => {
+export const WalletRecoverContainer: React.FC = () => {
   const { mnemonic, handleConfirmStoreSeed } = useMainContext();
   const { random, compare, onChange } = useWallet();
   const navigate = useNavigate();

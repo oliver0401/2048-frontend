@@ -14,6 +14,7 @@ export interface TileProps {
   isNew?: boolean;
   isMerging?: boolean;
   breakTile: (tile: Location) => void;
+  x2Tile: (tile: Location) => void;
 }
 
 const glass = [
@@ -32,6 +33,7 @@ const Tile: FC<TileProps> = ({
   isNew = false,
   isMerging = false,
   breakTile,
+  x2Tile,
 }) => {
   // Safelist the tile color classes
   const getTileColorClass = (val: number) => {
@@ -47,21 +49,36 @@ const Tile: FC<TileProps> = ({
       512: 'bg-tile-512 dark:bg-tile-512-dark',
       1024: 'bg-tile-1024 dark:bg-tile-1024-dark',
       2048: 'bg-tile-2048 dark:bg-tile-2048-dark',
+      4096: 'bg-tile-4096 dark:bg-tile-4096-dark',
+      8192: 'bg-tile-8192 dark:bg-tile-8192-dark',
+      16384: 'bg-tile-16384 dark:bg-tile-16384-dark',
+      32768: 'bg-tile-32768 dark:bg-tile-32768-dark',
+      65536: 'bg-tile-65536 dark:bg-tile-65536-dark',
     };
     return colorMap[val] || colorMap[2]; // fallback to 2 if value not found
   };
-  const { cursor, setCursor, themeImages, theme } = useMainContext();
+  const { cursor, setCursor, themeImages, theme, handleUpdateUser, user } =
+    useMainContext();
   const { open, onOpen, onClose } = useToggle(false);
+  const {
+    open: openX2,
+    onOpen: onOpenX2,
+    onClose: onCloseX2,
+  } = useToggle(false);
   const [breakImg, setBreakImg] = useState<string>(
     glass[Math.floor(Math.random() * 4)],
   );
-
-  console.log('theme', theme);
 
   const handleClick = () => {
     if (cursor === MOUSE.Hammer) {
       breakTile({ r: Math.floor(y / height), c: Math.floor(x / width) });
       setCursor(MOUSE.Default);
+      handleUpdateUser({ hammer: user?.hammer ? user?.hammer - 1 : 0 });
+    }
+    if (cursor === MOUSE.X2) {
+      x2Tile({ r: Math.floor(y / height), c: Math.floor(x / width) });
+      setCursor(MOUSE.Default);
+      handleUpdateUser({ bomb: user?.bomb ? user?.bomb - 1 : 0 });
     }
   };
 
@@ -72,12 +89,16 @@ const Tile: FC<TileProps> = ({
         if (cursor === MOUSE.Hammer) {
           onOpen();
         }
+        if (cursor === MOUSE.X2) {
+          onOpenX2();
+        }
       }}
       onMouseLeave={() => {
         if (cursor === MOUSE.Hammer) {
           setBreakImg(glass[Math.floor(Math.random() * 4)]);
-          onClose();
         }
+        onCloseX2();
+        onClose();
       }}
       onClick={handleClick}
       style={{
@@ -94,6 +115,7 @@ const Tile: FC<TileProps> = ({
           className="absolute top-0 left-0 w-full h-full z-20"
         />
       )}
+      {openX2 && <div className="bg-black/20 animate-pulse absolute top-0 left-0 w-full h-full z-20" />}
       <div
         className={`
           w-full h-full flex items-center justify-center
@@ -111,7 +133,7 @@ const Tile: FC<TileProps> = ({
           value
         ) : (
           <img
-            src={themeImages[value]}
+            src={themeImages[value]?.sm}
             alt="evolve"
             className="w-full h-full"
           />

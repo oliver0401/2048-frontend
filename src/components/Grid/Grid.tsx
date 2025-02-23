@@ -15,14 +15,14 @@ const Grid: FC<GridProps> = ({ width, height, rows, cols, spacing }) => {
     return cells.map((c) => (
       <div
         key={c}
-        className="w-full h-full bg-tertiary dark:bg-tertiary-dark rounded-2xl opacity-30"
+        className="w-full h-full bg-tertiary/60 dark:bg-tertiary-dark/50 rounded-2xl opacity-30"
       />
     ));
   }, [rows, cols]);
 
   return (
     <div
-      className="box-border grid bg-secondary dark:bg-secondary-dark rounded-md border-8 border-secondary dark:border-secondary-dark"
+      className="box-border grid bg-secondary/60 dark:bg-secondary-dark/50 rounded-md border-8 border-secondary dark:border-secondary-dark"
       style={{
         width: `${width}px`,
         height: `${height}px`,

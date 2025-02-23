@@ -1,39 +1,44 @@
 import React from 'react';
-import Text from '../Text';
-import { IoArrowUndo, IoHammerSharp } from 'react-icons/io5';
+import { IoHammerSharp } from 'react-icons/io5';
 import { FaBolt } from 'react-icons/fa';
+import { GiUpgrade } from 'react-icons/gi';
 import { useMainContext } from '../../context/MainContext';
 import { MOUSE } from '../../consts';
+import { ItemBoard } from '../ItemBoard';
 
 const Footer: React.FC = () => {
-  const { cursor, setCursor, onBoltOpen, boltStatus, setBoltStatus } =
-    useMainContext();
+  const {
+    cursor,
+    setCursor,
+    onBoltOpen,
+    boltStatus,
+    setBoltStatus,
+    user,
+    handleUpdateUser,
+  } = useMainContext();
   return (
     <div className="fixed bottom-0 w-full grid grid-cols-3 border-t-2 border-primary dark:border-primary-dark">
-      <div
-        onClick={() =>
-          setCursor(cursor === MOUSE.Hammer ? MOUSE.Default : MOUSE.Hammer)
-        }
-        className="w-full flex items-center justify-center gap-2 py-2 border-r border-primary dark:border-primary-dark hover:bg-tile-4/80 dark:hover:bg-tile-64/10 transition-colors"
-      >
-        <Text as="h1" color="primary" fontSize={16} className="font-bold">
-          <IoHammerSharp />
-        </Text>
-        <Text as="h1" color="primary" fontSize={16} className="font-bold">
-          0
-        </Text>
-      </div>
-      <div className="w-full flex items-center justify-center gap-2 border-r border-primary dark:border-primary-dark hover:bg-tile-4/80 dark:hover:bg-tile-64/10 transition-colors">
-        <Text as="h1" color="primary" fontSize={16} className="font-bold">
-          <IoArrowUndo />
-        </Text>
-        <Text as="h1" color="primary" fontSize={16} className="font-bold">
-          0
-        </Text>
-      </div>
-      <div
+      <ItemBoard
         onClick={() => {
-          if (!boltStatus.enabled) {
+          if (user?.hammer && user.hammer > 0) {
+            setCursor(cursor === MOUSE.Hammer ? MOUSE.Default : MOUSE.Hammer);
+          }
+        }}
+        icon={<IoHammerSharp />}
+        count={user?.hammer || 0}
+      />
+      <ItemBoard
+        onClick={() => {
+          if (user?.hammer && user.hammer > 0) {
+            setCursor(cursor === MOUSE.X2 ? MOUSE.Default : MOUSE.X2);
+          }
+        }}
+        icon={<GiUpgrade />}
+        count={user?.bomb || 0}
+      />
+      <ItemBoard
+        onClick={() => {
+          if (!boltStatus.enabled && user?.bolt && user.bolt > 0) {
             setBoltStatus({
               enabled: true,
               currentStart:
@@ -41,29 +46,14 @@ const Footer: React.FC = () => {
                 0,
             });
             onBoltOpen();
+            handleUpdateUser({ bolt: user?.bolt ? user?.bolt - 1 : 0 });
           }
         }}
-        className="w-full flex items-center justify-center gap-2 hover:bg-tile-4/80 dark:hover:bg-tile-64/10 transition-colors"
-      >
-        <div
-          className={`text-lg ${
-            boltStatus.enabled
-              ? 'text-blue-500'
-              : 'text-primary dark:text-primary-dark font-bold'
-          }`}
-        >
-          <FaBolt />
-        </div>
-        <div
-          className={`text-lg ${
-            boltStatus.enabled
-              ? 'text-blue-500'
-              : 'text-primary dark:text-primary-dark font-bold'
-          }`}
-        >
-          0
-        </div>
-      </div>
+        icon={<FaBolt />}
+        count={user?.bolt || 0}
+        checktatus
+        status={boltStatus.enabled}
+      />
     </div>
   );
 };

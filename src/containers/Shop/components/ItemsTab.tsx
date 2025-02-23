@@ -7,7 +7,7 @@ import { FaBolt, FaBomb } from 'react-icons/fa';
 const items = [
   {
     name: 'Hammer',
-    price: 20,
+    price: 10,
     description: 'A powerful tool to break obstacles.',
     Icon: <IoHammerSharp className="relative z-20 text-gray-800 dark:text-gray-500 min-h-16 min-w-16" />,
   },
@@ -25,7 +25,14 @@ const items = [
   },
 ];
 
-const ItemsTab: React.FC<{ handlePurchase: (price: number) => void }> = ({ handlePurchase }) => {
+const ItemsTab: React.FC<{
+  handlePurchase: (item: {
+    name: string;
+    price: number;
+    type: 'item' | 'theme' | 'border';
+    id?: string;
+  }) => void;
+}> = ({ handlePurchase }) => {
   return (
     <div className="grid grid-cols-1 gap-3 w-full">
       {items.map((item) => (
@@ -43,11 +50,17 @@ const ItemsTab: React.FC<{ handlePurchase: (price: number) => void }> = ({ handl
             </Text>
             <div className="flex justify-end w-full">
               <Button
-                onClick={() => handlePurchase(item.price)}
+                onClick={() =>
+                  handlePurchase({
+                    name: item.name,
+                    price: item.price * 100, // Convert to cents
+                    type: 'item',
+                  })
+                }
                 color="transparent"
                 className="hover:scale-110 transition-transform max-w-min flex items-center gap-2 text-nowrap font-bold text-primary-dark dark:text-primary-dark border-2 border-primary-dark dark:border-primary-dark rounded-md px-2 py-1"
               >
-                Get For: {item.price}
+                Get For: ${item.price}
                 <IoDiamondOutline size={20} />
               </Button>
             </div>

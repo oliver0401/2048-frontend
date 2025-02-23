@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import Text from '../Text';
 import { useMainContext } from '../../context/MainContext';
 import { PATH } from '../../consts';
@@ -8,17 +8,19 @@ import {
   HiOutlineClipboardDocument,
   HiOutlineClipboardDocumentCheck,
 } from 'react-icons/hi2';
-import { IoColorPaletteOutline, IoDocumentTextOutline } from 'react-icons/io5';
+import {
+  IoColorPaletteOutline,
+  IoDocumentTextOutline,
+  IoStatsChart,
+  IoWallet,
+} from 'react-icons/io5';
 import { BsShop } from 'react-icons/bs';
 import { VscSignOut } from 'react-icons/vsc';
 import { useToggle } from '../../hooks/useToggle';
-import { ThemeModal } from './ThemeModal';
+import { ThemeSelectModal } from './ThemeSelectModal';
 
 const Navbar: React.FC = () => {
   const { user, handleSignOut } = useMainContext();
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
   const { open, onOpen, onClose } = useToggle(false);
   const {
     open: themeOpen,
@@ -40,6 +42,11 @@ const Navbar: React.FC = () => {
         icon: IoDocumentTextOutline,
       },
       {
+        label: 'Wallet',
+        onClick: () => navigate(PATH.WALLET),
+        icon: IoWallet,
+      },
+      {
         label: 'Shop',
         onClick: () => navigate(PATH.SHOP),
         icon: BsShop,
@@ -51,6 +58,11 @@ const Navbar: React.FC = () => {
           onThemeOpen();
         },
         icon: IoColorPaletteOutline,
+      },
+      {
+        label: 'Leaderboard',
+        onClick: () => navigate(PATH.LEADERBOARD),
+        icon: IoStatsChart,
       },
       {
         label: 'Sign out',
@@ -109,7 +121,7 @@ const Navbar: React.FC = () => {
           {content}
         </div>
       </div>
-      <ThemeModal isOpen={themeOpen} onClose={onThemeClose} />
+      <ThemeSelectModal isOpen={themeOpen} onClose={onThemeClose} />
     </div>
   );
 };

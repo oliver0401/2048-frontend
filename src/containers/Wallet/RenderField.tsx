@@ -2,7 +2,7 @@ import React from 'react';
 import Text from '../../components/Text';
 
 interface RenderFieldProps {
-  label: string;
+  label: React.ReactNode;
   value: React.ReactNode;
 }
 
@@ -13,9 +13,9 @@ export const RenderField: React.FC<RenderFieldProps> = ({ label, value }) => {
     className: 'capitalize font-bold',
   };
   return (
-    <div className="w-full flex items-center justify-between gap-8 px-4 py-4 rounded-xl shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-lg shadow-primary/10 dark:shadow-primary-dark/10">
+    <div className="w-full flex items-center justify-between gap-8 px-4 py-4 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-105">
       <Text as="h2" {...textProps} className="text-primary dark:text-primary-dark tracking-wide">
-        {label}:
+        {label}
       </Text>
       <Text
         as="div"

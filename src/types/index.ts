@@ -5,9 +5,12 @@ export type TUser = {
   address?: string;
   maxScore: number;
   maxTile: number;
-  minMoves: number;
+  maxMoves: number;
   rows: number;
   cols: number;
+  hammer: number;
+  bolt: number;
+  bomb: number;
 };
 
 
@@ -35,27 +38,40 @@ export type TSeed = {
   confirm: boolean;
 };
 
+export type TTileImg = {
+  sm: string;
+  lg: string;
+  title: string;
+  description: string;
+  pl: string;
+  pd: string;
+}
 export type TTheme = {
   uuid: string;
   title: string;
   description: string;
-  2:string;
-  4:string;
-  8:string;
-  16: string;
-  32: string;
-  64: string;
-  128: string;
-  256: string;
-  512: string;
-  1024: string;
-  2048: string;
-  4096: string;
-  8192: string;
+  2:TTileImg;
+  4:TTileImg;
+  8:TTileImg;
+  16: TTileImg;
+  32: TTileImg;
+  64: TTileImg;
+  128: TTileImg;
+  256: TTileImg;
+  512: TTileImg;
+  1024: TTileImg;
+  2048: TTileImg;
+  4096: TTileImg;
+  8192: TTileImg;
   owned: boolean;
 };
 
 export type TBoltStatus = {
   enabled: boolean;
   currentStart: number;
+}
+
+export type TOption = {
+  label: React.ReactNode;
+  value: string;
 }
