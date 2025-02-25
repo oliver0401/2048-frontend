@@ -1,6 +1,5 @@
 import React from 'react';
 import Text from '../../../components/Text';
-import { IoDiamondOutline } from 'react-icons/io5';
 import './ThemeTab.css';
 import { useThemeTab } from '../../../hooks/useThemeTab';
 
@@ -10,12 +9,7 @@ interface ThemeComponentProps {
   image: string;
   uuid: string;
   owned: boolean;
-  handleBuyTheme: (item: {
-    name: string;
-    price: number;
-    type: 'item' | 'theme' | 'border';
-    id?: string;
-  }) => void;
+  handleBuyTheme: (themeId: string) => Promise<void>;
 }
 const ThemeComponent: React.FC<ThemeComponentProps> = ({
   title,
@@ -28,13 +22,15 @@ const ThemeComponent: React.FC<ThemeComponentProps> = ({
   return (
     <div className="flex items-center w-full min-h-40 border-2 border-primary dark:border-primary-dark rounded-2xl p-2 gap-4">
       <div className="relative">
-        {owned && <div className="absolute -left-[6px] -top-[6px] overflow-hidden min-w-20 min-h-20 max-w-20 bg-transparent flex items-center justify-center">
-          <div className="z-20 relative -top-[8.5px] -left-[8.5px] bg-blue-600 text-white text-xs font-bold min-w-28 h-6 text-center transform -rotate-45 flex items-center justify-center">
-            Purchased
+        {owned && (
+          <div className="absolute -left-[6px] -top-[6px] overflow-hidden min-w-20 min-h-20 max-w-20 bg-transparent flex items-center justify-center">
+            <div className="z-20 relative -top-[8.5px] -left-[8.5px] bg-blue-600 text-white text-xs font-bold min-w-28 h-6 text-center transform -rotate-45 flex items-center justify-center">
+              Purchased
+            </div>
+            <div className="z-10 absolute top-0 right-0 min-w-[6px] min-h-[6px] bg-blue-800"></div>
+            <div className="z-10 absolute bottom-0 left-0 min-w-[6px] min-h-[6px] bg-blue-800"></div>
           </div>
-          <div className="z-10 absolute top-0 right-0 min-w-[6px] min-h-[6px] bg-blue-800"></div>
-          <div className="z-10 absolute bottom-0 left-0 min-w-[6px] min-h-[6px] bg-blue-800"></div>
-        </div>}
+        )}
         <img
           src={image}
           alt="theme"
@@ -56,16 +52,10 @@ const ThemeComponent: React.FC<ThemeComponentProps> = ({
         <div className="w-full flex justify-end">
           {!owned && (
             <button
-              onClick={() => handleBuyTheme({
-                name: title,
-                price: 100,
-                type: 'theme',
-                id: uuid,
-              })}
+              onClick={() => handleBuyTheme(uuid)}
               className="hover:scale-105 bg-transparent transition-transform max-w-min flex items-center gap-2 text-nowrap font-bold text-primary dark:text-primary-dark border-2 border-primary dark:border-primary-dark rounded-md px-2 py-1"
             >
-              Get For: 100
-              <IoDiamondOutline size={20} />
+              Get For 1$
             </button>
           )}
         </div>
@@ -73,16 +63,12 @@ const ThemeComponent: React.FC<ThemeComponentProps> = ({
     </div>
   );
 };
-const ThemeTab: React.FC<{ handlePurchase: (item: {
-  name: string;
-  price: number;
-  type: 'item' | 'theme' | 'border';
-  id?: string;
-}) => void;
+const ThemeTab: React.FC<{
+  handlePurchase: (themeId: string) => Promise<void>;
 }> = ({ handlePurchase }) => {
   const { themes } = useThemeTab();
   return (
-    <div className="w-full flex flex-col">
+    <div className="w-full flex flex-col gap-2">
       {themes.map((theme) => (
         <ThemeComponent
           key={theme.uuid}

@@ -7,7 +7,7 @@ import {
 } from 'react-icons/hi2';
 import { useClipboard } from '../../hooks/useClipboard';
 import Button from '../../components/Button';
-import { PATH } from '../../consts';
+import { PATH, TOKEN } from '../../consts';
 import { useNavigate } from 'react-router-dom';
 import { IoArrowBack, IoKey, IoWallet } from 'react-icons/io5';
 import { TbSeeding } from 'react-icons/tb';
@@ -16,11 +16,13 @@ import { PrivateKeyModal } from './PrivateKeyModal';
 import { ImportWalletModal } from './ImportWalletModal';
 import { RenderField } from './RenderField';
 import { ShowSeedModal } from './ShowSeedModal';
-import { SiEthereum, SiPolygon, SiTether } from 'react-icons/si';
+import { SiEthereum, SiPolygon } from 'react-icons/si';
 import { SiBinance } from 'react-icons/si';
 import { DropDown } from '../../components/DropDown';
-import { TOption } from '../../types';
+import { TOption, TToken } from '../../types';
 import { useDropDown } from '../../hooks/useDropDown';
+import arbitrum from '../../assets/svg/arbitrum.svg';
+import hrks from '../../assets/img/hrks.png';
 
 export const WalletContainer: React.FC = () => {
   const { user } = useMainContext();
@@ -54,7 +56,7 @@ export const WalletContainer: React.FC = () => {
       {
         label: (
           <div className="flex items-center gap-2 text-purple-500 text-[16px]">
-            <SiPolygon className="text-purple-500" />
+            <SiPolygon className="text-purple-500" size={24} />
             Polygon Mainnet
           </div>
         ),
@@ -63,7 +65,7 @@ export const WalletContainer: React.FC = () => {
       {
         label: (
           <div className="flex items-center gap-2 text-blue-500 text-[16px] text-nowrap">
-            <SiEthereum className="text-blue-500" />
+            <SiEthereum className="text-blue-500" size={24} />
             Ethereum Mainnet
           </div>
         ),
@@ -72,11 +74,20 @@ export const WalletContainer: React.FC = () => {
       {
         label: (
           <div className="flex items-center gap-2 text-yellow-500 text-[16px]">
-            <SiBinance className="text-yellow-500" />
+            <SiBinance className="text-yellow-500" size={24} />
             Binance Mainnet
           </div>
         ),
         value: 'bnb',
+      },
+      {
+        label: (
+          <div className="flex items-center gap-2 text-cyan-500 text-[16px]">
+            <img src={arbitrum} alt="arbitrum" className="w-6 h-6" />
+            Arbitrum Mainnet
+          </div>
+        ),
+        value: 'arb',
       },
     ],
     [],
@@ -84,24 +95,22 @@ export const WalletContainer: React.FC = () => {
 
   const { selectedOption, onSelect } = useDropDown(networks);
 
-  const tokens = useMemo(
+  const tokens: Record<'pol' | 'eth' | 'bnb' | 'arb', TToken[]> = useMemo(
     () => ({
-      pol: {
-        polygon: {
-          contractAddress: "0x5A534988535cf27a70e74dFfe299D06486f185B7"
+      pol: [
+        TOKEN.POL,
+        {
+          unit: 'HRKS',
+          icon: <img src={hrks} alt="hrks" className="w-8 h-8" />,
+          endpoint: '0x5A534988535cf27a70e74dFfe299D06486f185B7',
+          name: 'hrks',
         },
-        gameToken: {},
-        pusdt: {
-          contractAddress: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
-        },
-        pusdc: {
-          contractAddress: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
-        }
-      },
-      eth: { ethereum: {
-        contractAddress: ""
-      }, usdt: {}, usdc: {} },
-      bnb: { binance: {}, busdt: {}, busdc: {} },
+        TOKEN.PUSDT,
+        TOKEN.PUSDC,
+      ],
+      eth: [TOKEN.ETH, TOKEN.EUSDT, TOKEN.EUSDC],
+      bnb: [TOKEN.BNB, TOKEN.BUSDT, TOKEN.BUSDC],
+      arb: [TOKEN.ARB, TOKEN.AUSDT, TOKEN.AUSDC],
     }),
     [],
   );
@@ -122,25 +131,17 @@ export const WalletContainer: React.FC = () => {
         </div>
       </div>
 
-      {RenderField({
-        label: <SiEthereum className="text-blue-500" />,
-        value: <span className="text-lg text-blue-500">0 ETH</span>,
-      })}
-
-      {RenderField({
-        label: <SiBinance className="text-yellow-500" />,
-        value: <span className="text-lg text-yellow-500">0 BNB</span>,
-      })}
-
-      {RenderField({
-        label: <SiPolygon className="text-purple-500" />,
-        value: <span className="text-lg text-purple-500">0 POL</span>,
-      })}
-
-      {RenderField({
-        label: <SiTether className="text-green-500" />,
-        value: <span className="text-lg text-green-500">0 USDT</span>,
-      })}
+      {tokens[selectedOption.value as 'pol' | 'eth' | 'bnb'].map(
+        (token, idx) => (
+          <RenderField
+            key={idx}
+            label={token.icon}
+            value={
+              <span className="text-lg text-blue-500">0 {token.unit}</span>
+            }
+          />
+        ),
+      )}
 
       <Button
         onClick={onOpen}

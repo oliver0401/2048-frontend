@@ -75,3 +75,12 @@ export type TOption = {
   label: React.ReactNode;
   value: string;
 }
+
+export type TToken = {
+  name: string;
+  icon: React.ReactNode;
+  endpoint: string;
+  unit: string;
+}
+
+
