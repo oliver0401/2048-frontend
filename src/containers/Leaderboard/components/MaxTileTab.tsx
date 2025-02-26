@@ -39,7 +39,7 @@ export const MaxTileTab: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col items-center justify-start gap-4 overflow-auto h-[calc(100vh-272px)] px-1">
-      {tiles.map((tile, idx) => (
+      {tiles.map((tile, idx) => tileData[idx]?.count > 0 && (
         <div
           key={tile}
           className={`w-full max-w-2xl flex items-center justify-between p-2 bg-white dark:bg-gray-800/80 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${
@@ -66,7 +66,7 @@ export const MaxTileTab: React.FC = () => {
           <div className="flex items-center gap-2">
             <div className="px-3 py-2 bg-primary dark:bg-primary-dark text-white rounded-lg font-medium min-w-32 flex items-center justify-between">
               <div className="">Rate:</div>
-              <div className="">{tileData[idx]?.rate * 100 || 0}%</div>
+              <div className="">{(tileData[idx]?.rate * 100).toFixed(2) || 0}%</div>
             </div>
           </div>
         </div>

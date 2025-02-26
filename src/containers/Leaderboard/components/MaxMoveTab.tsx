@@ -51,9 +51,6 @@ export const MaxMoveTab: React.FC = () => {
                 >
                   {score.username}
                 </div>
-                <div className="text-sm dark:text-tile-8 text-gray-500">
-                  {score.email}
-                </div>
               </div>
               <div className="text-lg font-bold">{score.maxMoves}</div>
             </li>
