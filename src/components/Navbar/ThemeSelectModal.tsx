@@ -57,7 +57,7 @@ export const ThemeSelectModal = ({ isOpen, onClose }: ThemeSelectModalProps) => 
             Basic
           </h1>
         </div>
-        {themes.map((t) => (
+        {themes.map((t) => t.owned && (
           <div key={t.uuid} className="flex flex-col items-center gap-2">
             <div
               className="relative max-w-32 max-h-32 min-w-32 min-h-32"

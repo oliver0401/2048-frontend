@@ -3,14 +3,12 @@ import Button from '../../components/Button';
 import { IoArrowBack } from 'react-icons/io5';
 import Tabs from '../../components/Tabs';
 import { useMainContext } from '../../context/MainContext';
-import { PATH } from '../../consts';
+import { PATH, TOKEN } from '../../consts';
 import ItemsTab from './components/ItemsTab'; // Import the new ItemsTab component
 import BorderSizeTab from './components/BorderSizeTab'; // Import the new BorderSizeTab component
 import ThemeTab from './components/ThemeTab'; // Import the new ThemeTab component
 import { useNavigate } from 'react-router-dom';
 import Modal from '../../components/Modal';
-import Text from '../../components/Text';
-import CheckoutForm from './components/CheckoutForm';
 
 export const ShopContainer: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,7 +18,7 @@ export const ShopContainer: React.FC = () => {
     type: 'item' | 'theme' | 'border';
     id?: string;
   } | null>(null);
-  const { user } = useMainContext();
+  const { user, handleBuyTheme } = useMainContext();
   const navigate = useNavigate();
 
   const handlePurchase = (item: {
@@ -32,6 +30,26 @@ export const ShopContainer: React.FC = () => {
     setSelectedItem(item);
     setIsModalOpen(true);
   };
+
+  const [themeId, setThemeId] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+
+  const handlePurchaseTheme = async (id: string) => {
+    setThemeId(id);
+    setIsModalOpen(true);
+  };
+
+  const tokens = useMemo(
+    () => [
+      TOKEN.PUSDT,
+      TOKEN.BUSDT,
+      TOKEN.AUSDT,
+      TOKEN.PUSDC,
+      TOKEN.BUSDC,
+      TOKEN.AUSDC,
+    ],
+    [],
+  );
 
   const tabs = useMemo(
     () => [
@@ -45,7 +63,7 @@ export const ShopContainer: React.FC = () => {
       },
       {
         label: 'Theme',
-        content: <ThemeTab handlePurchase={handlePurchase} />,
+        content: <ThemeTab handlePurchase={handlePurchaseTheme} />,
       },
     ],
     [user],
@@ -64,27 +82,36 @@ export const ShopContainer: React.FC = () => {
         />
         Return to Game
       </Button>
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Purchase">
-        <div className="w-full flex flex-col gap-4">
-          {selectedItem && (
-            <>
-              <Text as="h2" color="tile32" fontSize={24} className="font-semibold">
-                Purchase {selectedItem.name}
-              </Text>
-              <Text color="primary" fontSize={16}>
-                Price: ${selectedItem.price / 100}
-              </Text>
-              <CheckoutForm
-                amount={selectedItem.price}
-                itemType={selectedItem.type}
-                itemId={selectedItem.id}
-                onSuccess={() => {
-                  setIsModalOpen(false);
-                  setSelectedItem(null);
-                }}
-              />
-            </>
-          )}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Purchase"
+      >
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-3 gap-4">
+            {tokens.map((tk) => (
+              <div
+                key={tk.name}
+                onClick={() => setToken(tk.name)}
+                className={`flex items-center justify-center gap-4 p-3 rounded-md ${
+                  token === tk.name
+                    ? 'border-2 border-primary/50 dark:border-primary-dark/50'
+                    : 'border border-primary/50 dark:border-primary-dark/50 hover:bg-primary/5 dark:hover:bg-primary-dark/5'
+                } transition-all`}
+              >
+                {tk.icon}
+              </div>
+            ))}
+          </div>
+          <div className="text-primary dark:text-primary-dark">
+            Current Balance: <span className="font-bold">100 USDT</span>
+          </div>
+          <div className="text-primary dark:text-primary-dark">
+            Purchase Price: <span className="font-bold">1 USDT</span>
+          </div>
+          <Button onClick={() => setIsModalOpen(false)} className="w-full">
+            Purchase
+          </Button>
         </div>
       </Modal>
     </div>

@@ -16,8 +16,11 @@ export const DropDown: React.FC<DropDownProps> = ({
 }) => {
   const { open, onToggle, onClose } = useToggle(false);
   return (
-    <div className="relative min-w-44 text-lg border border-primary dark:border-primary-dark rounded-md px-2 py-1 focus:outline-none focus:ring-0 focus:ring-offset-0">
-      <div className="text-primary dark:text-primary-dark text-lg" onClick={onToggle}>
+    <div className="relative min-w-48 text-lg border border-primary dark:border-primary-dark rounded-md px-4 py-2 focus:outline-none focus:ring-0 focus:ring-offset-0">
+      <div
+        className="text-primary dark:text-primary-dark text-lg"
+        onClick={onToggle}
+      >
         {options.find((option) => option.value === selectedOption)?.label}
       </div>
 
@@ -28,15 +31,15 @@ export const DropDown: React.FC<DropDownProps> = ({
         />
       )}
       <div
-        className={`flex flex-col absolute top-9 left-0 w-full dark:bg-gray-800 bg-background rounded-md py-1 z-20 dropdown-fade-in border border-primary/30 dark:border-primary-dark/30 ${
-          open ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        className={`flex flex-col absolute top-9 left-0 w-full dark:bg-gray-800 bg-background rounded-md py-1 z-20 dropdown-fade-in border border-none ${
+          open ? 'opacity-100' : 'opacity-0 -translate-y-5 pointer-events-none'
         } transition-all`}
         onClick={(e) => e.stopPropagation()}
       >
         {options.map((option) => (
           <div
             key={option.value}
-            className="hover:bg-primary/10 dark:hover:bg-primary-dark/10 p-1"
+            className="hover:bg-primary/10 dark:hover:bg-primary-dark/10 px-4 py-2"
             onClick={() => {
               onSelect(option);
               onClose();
