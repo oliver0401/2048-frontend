@@ -77,7 +77,7 @@ export const AddressContainer: React.FC = () => {
       <Button
         color="tile64"
         onClick={() => {
-          navigate(PATH.WALLET);
+          navigate(PATH.WALLET_RECOVER);
         }}
         disabled={!open}
         className="w-full"
