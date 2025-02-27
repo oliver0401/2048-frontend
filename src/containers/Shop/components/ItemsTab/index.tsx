@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { IoDiamondOutline, IoHammerSharp } from 'react-icons/io5';
 import { FaBolt } from 'react-icons/fa';
 import { GiUpgrade } from 'react-icons/gi';
 import { Item } from './Item';
 import Button from '../../../../components/Button';
+import { TUser } from '../../../../types';
 
 const items = [
   {
@@ -28,14 +29,18 @@ const items = [
   },
 ];
 
-const ItemsTab: React.FC<{
+interface ItemsTabProps {
   handlePurchase: (item: {
     name: string;
     price: number;
-    type: 'item' | 'theme' | 'border';
+    type: 'item' | 'theme' | 'border-rows' | 'border-cols';
+    quantity: Partial<TUser>;
     id?: string;
   }) => void;
-}> = ({ handlePurchase }) => {
+  isPaying: boolean;
+}
+const ItemsTab: React.FC<ItemsTabProps> = ({ handlePurchase, isPaying }) => {
+
   const [quantity, setQuantity] = useState<Record<string, number>>({
     hammer: 0,
     powerup: 0,
@@ -78,15 +83,18 @@ const ItemsTab: React.FC<{
         </div>
         <Button
           color="primary"
-          onClick={() =>
-            handlePurchase({
-              name: 'items',
-              price: totalQuantity,
-              type: 'item',
-            })
+          onClick={async () => {
+              handlePurchase({
+                name: 'items',
+                price: totalQuantity,
+                type: 'item',
+                quantity: quantity
+              })
+            }
           }
+          disabled={isPaying}
         >
-          Purchase
+          {isPaying ? "Paying..." : "Purchase"}
         </Button>
       </div>
     </div>

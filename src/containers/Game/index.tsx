@@ -1,4 +1,5 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 import Control from '../../components/Control';
 import GameBoard from '../../components/GameBoard';
 import ScoreBoard from '../../components/ScoreBoard';
@@ -15,6 +16,8 @@ import { BsLightningFill } from 'react-icons/bs';
 import './game.css';
 import Modal from '../../components/Modal';
 import { useToggle } from '../../hooks/useToggle';
+import { HttpStatusCode } from 'axios';
+import Button from '../../components/Button';
 
 export type Configuration = {
   bestScore: number;
@@ -38,6 +41,7 @@ export const GameContainer: FC = () => {
     themeImages,
     theme,
     handleUpdateUser,
+    handleRequestRewarding
   } = useMainContext();
   const [gameState, setGameStatus] = useGameState({
     status: 'running',
@@ -83,6 +87,7 @@ export const GameContainer: FC = () => {
 
   const [isUserChanging, setIsUserChanging] = useState(false);
   const [pendingFunction, setPendingFunction] = useState<Function | null>(null);
+  const [isRewarding, setIsRewarding] = useState(false);
 
   const onResetGame = useCallback(() => {
     setGameStatus('restart');
@@ -94,6 +99,31 @@ export const GameContainer: FC = () => {
     },
     [setGameStatus],
   );
+
+  const handleRewarding = async () => {
+    setIsRewarding(true);
+    try {
+      const res: any = await handleRequestRewarding(user?.address || "", totalEarnings);
+      switch (res.status) {
+        case HttpStatusCode.Ok:
+          toast.success(`${res.data.message}! \n You received ${res.data.amount} GLD tokens`, {
+            style: { whiteSpace: "pre-line" }
+          });
+          break;
+        case HttpStatusCode.BadRequest:
+          toast.warning(res.data);
+        case HttpStatusCode.InternalServerError:
+          toast.error(res.data);
+        default:
+          break;
+      }
+    } catch (err: any) {
+      console.log(err);
+      toast.error(err.message);
+    } finally {
+      setIsRewarding(false);
+    }
+  }
 
   const onChangeRow = (newRows: number) => {
     onFinishOpen();
@@ -311,18 +341,15 @@ export const GameContainer: FC = () => {
               </Text>
             </div>
             <div className="flex gap-4 w-full justify-end">
-              <button
+              <Button
                 onClick={onFinishClose}
                 className="bg-primary hover:bg-primary/80 text-white px-2 py-1 rounded-md min-w-24 transition-all"
               >
                 Continue
-              </button>
-              <button
-                onClick={() => {
-                  if (pendingFunction) {
-                    pendingFunction();
-                    setPendingFunction(null);
-                  }
+              </Button>
+              <Button
+                onClick={async () => {
+                  await handleRewarding();
                   onResetGame();
                   onFinishClose();
                   if (user) {
@@ -340,10 +367,11 @@ export const GameContainer: FC = () => {
                     }
                   }
                 }}
+                disabled={isRewarding}
                 className="bg-primary-dark hover:bg-primary-dark/80 text-white px-2 py-1 rounded-md min-w-24 transition-all"
               >
-                Finish
-              </button>
+                {isRewarding ? "Processing..." : "Finish"}
+              </Button>
             </div>
           </div>
         </Modal>
