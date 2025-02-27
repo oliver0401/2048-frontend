@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import {
   Game,
   Home,
@@ -15,12 +16,13 @@ import {
 import { PATH } from './consts';
 import './index.css';
 import { PrivateRoute } from './components/PrivateRoute';
-import { MainProvider, GameProvider } from './context';
+import { MainProvider, GameProvider, Web3Provider } from './context';
 
 export const App = () => {
   return (
     <BrowserRouter>
       <MainProvider>
+        <Web3Provider>
           <GameProvider>
             <Routes>
               <Route path={PATH.GAME} element={<PrivateRoute Page={Game} />} />
@@ -43,14 +45,17 @@ export const App = () => {
               <Route
                 path={PATH.LEADERBOARD}
                 element={<PrivateRoute Page={Leaderboard} />}
-            />
-            <Route
-              path={PATH.WALLET}
-              element={<PrivateRoute Page={Wallet} />}
-            />
-          </Routes>
-        </GameProvider>
+              />
+              <Route
+                path={PATH.WALLET}
+                element={<PrivateRoute Page={Wallet} />}
+              />
+            </Routes>
+          </GameProvider>
+        </Web3Provider>
       </MainProvider>
+      <ToastContainer />
     </BrowserRouter>
+    
   );
 };

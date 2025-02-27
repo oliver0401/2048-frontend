@@ -9,8 +9,8 @@ export type TUser = {
   rows: number;
   cols: number;
   hammer: number;
-  bolt: number;
-  bomb: number;
+  powerup: number;
+  upgrade: number;
 };
 
 

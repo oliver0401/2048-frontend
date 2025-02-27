@@ -34,11 +34,11 @@ const Footer: React.FC = () => {
           }
         }}
         icon={<GiUpgrade />}
-        count={user?.bomb || 0}
+        count={user?.upgrade || 0}
       />
       <ItemBoard
         onClick={() => {
-          if (!boltStatus.enabled && user?.bolt && user.bolt > 0) {
+          if (!boltStatus.enabled && user?.powerup && user?.powerup > 0) {
             setBoltStatus({
               enabled: true,
               currentStart:
@@ -46,11 +46,11 @@ const Footer: React.FC = () => {
                 0,
             });
             onBoltOpen();
-            handleUpdateUser({ bolt: user?.bolt ? user?.bolt - 1 : 0 });
+            handleUpdateUser({ powerup: user?.powerup ? user?.powerup - 1 : 0 });
           }
         }}
         icon={<FaBolt />}
-        count={user?.bolt || 0}
+        count={user?.powerup || 0}
         checktatus
         status={boltStatus.enabled}
       />

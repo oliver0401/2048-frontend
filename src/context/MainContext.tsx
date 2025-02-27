@@ -48,12 +48,15 @@ interface MainContextType {
   handleSignUp: (user: TSignUp) => Promise<void>;
   token: string;
   setToken: (token: string) => void;
+  privateKey: string;
+  setPrivateKey: (privateKey: string) => void;
   handleGetUser: () => Promise<void>;
   mnemonic: string[];
   setMnemonic: (mnemonic: string[]) => void;
   handleConfirmStoreSeed: (seed: string) => Promise<void>;
   handleSignOut: () => void;
   handleGetPrivateKey: (email: string, password: string) => Promise<string>;
+  handleRequestRewarding: (address: string, amount: number) => Promise<object>;
   handleStoreSeed: (data: THandleStoreSeed) => Promise<void>;
   handleGetSeed: (email: string, password: string) => Promise<TSeed>;
   cursor: string;
@@ -91,6 +94,7 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState<TUser | null>(null);
+  const [privateKey, setPrivateKey] = useState<string>("");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [token, setToken] = useLocalStorage('token', '');
   const [mnemonic, setMnemonic] = useState<string[]>([]);
@@ -142,6 +146,9 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
   const handleSignIn = async (signIn: TSignIn) => {
     try {
       const { data } = await api().post('/auth/signin', signIn);
+      const pk = await handleGetPrivateKey(signIn.email, signIn.password);
+      setPrivateKey(pk);
+      console.log(pk);
       setPassword(signIn.password);
       setToken(data.token);
       setIsAuthenticated(true);
@@ -298,6 +305,15 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
     const { data } = await api().get('/calc/max-score');
     return data;
   };
+
+  const handleRequestRewarding = async (address: String, amount: Number) => {
+    const res = await api().post('./reward/send', {
+      address,
+      amount
+    });
+    return res;
+  }
+
   useEffect(() => {
     if (user) {
       handleGetThemes();
@@ -314,12 +330,15 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
         handleSignUp,
         token,
         setToken,
+        privateKey,
+        setPrivateKey,
         handleGetUser,
         mnemonic,
         setMnemonic,
         handleConfirmStoreSeed,
         handleSignOut,
         handleGetPrivateKey,
+        handleRequestRewarding,
         handleStoreSeed,
         handleGetSeed,
         cursor,
