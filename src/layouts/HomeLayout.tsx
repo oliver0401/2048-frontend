@@ -18,7 +18,7 @@ export const HomeLayout: React.FC<{
     theme: ThemeName.DEFAULT,
   });
   const [{ name: themeName }, setTheme] = useTheme(config.theme);
-  
+
   useEffect(() => {
     setConfig({ theme: themeName });
   }, [themeName, setConfig]);
@@ -27,16 +27,19 @@ export const HomeLayout: React.FC<{
     <div className="min-h-screen h-full w-full bg-background dark:bg-background-dark transition-colors duration-200">
       <CustomCursor />
       <div className="relative z-20 flex justify-center w-full h-full items-start rounded-none overflow-hidden">
-        <div className="flex justify-start flex-col h-full items-center" style={{ width: `${GRID_SIZE}px` }}>
-          <div className="mt-6 w-full flex justify-end relative z-10 py-2">
-            <Switch
-              title="dark mode"
-              checked={themeName === ThemeName.DARK}
-              activeValue={ThemeName.DARK}
-              inactiveValue={ThemeName.DEFAULT}
-              onChange={setTheme}
-            />
-          </div>
+        <div className="mt-6 w-full flex justify-end relative z-10 py-2">
+          <Switch
+            title="dark mode"
+            checked={themeName === ThemeName.DARK}
+            activeValue={ThemeName.DARK}
+            inactiveValue={ThemeName.DEFAULT}
+            onChange={setTheme}
+          />
+        </div>
+        <div
+          className="flex justify-start flex-col h-full items-center"
+          style={{ width: `${GRID_SIZE}px` }}
+        >
           {children}
         </div>
       </div>
