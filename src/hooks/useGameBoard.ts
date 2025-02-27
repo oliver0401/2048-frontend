@@ -239,7 +239,7 @@ const resetGameBoard = (rows: number, cols: number) => {
 };
 
 const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGrid, addCount }: GameBoardParams) => {
-  const { boltStatus } = useMainContext();
+  const { powerupStatus } = useMainContext();
   const gridMapRef = useLazyRef(() => {
     let grid: Cell[][];
     let tiles: Tile[];
@@ -310,14 +310,14 @@ const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGr
         grid,
       } = mergeAndCreateNewTiles(gridMapRef.current.grid);
       gridMapRef.current = { grid, tiles: newTiles };
-      boltStatus.enabled ? addScore(score * 2) : addScore(score);
+      powerupStatus.enabled ? addScore(score * 2) : addScore(score);
       addCount();
       pendingStackRef.current = newTiles
         .filter((tile) => tile.isMerging || tile.isNew)
         .map((tile) => tile.index);
       setTiles(sortTiles(newTiles));
     }
-  }, [addScore, addCount, boltStatus.enabled, gridMapRef]);
+  }, [addScore, addCount, powerupStatus.enabled, gridMapRef]);
 
   const onMergePending = useCallback(() => {
     pendingStackRef.current.pop();

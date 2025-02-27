@@ -34,14 +34,15 @@ const APP_NAME = 'react-2048';
 export const GameContainer: FC = () => {
   const {
     user,
-    boltOpen,
-    onBoltClose,
-    boltStatus,
-    setBoltStatus,
+    powerupOpen,
+    onPowerupClose,
+    powerupStatus,
+    setPowerupStatus,
     themeImages,
     theme,
     handleUpdateUser,
-    handleRequestRewarding
+    handleRequestRewarding,
+    setItemUsed,
   } = useMainContext();
   const [gameState, setGameStatus] = useGameState({
     status: 'running',
@@ -91,7 +92,8 @@ export const GameContainer: FC = () => {
 
   const onResetGame = useCallback(() => {
     setGameStatus('restart');
-  }, [setGameStatus]);
+    setItemUsed({ powerup: false, upgrade: false });
+  }, [setGameStatus, setItemUsed]);
 
   const onCloseNotification = useCallback(
     (currentStatus: GameStatus) => {
@@ -182,8 +184,8 @@ export const GameContainer: FC = () => {
   }, [rows, cols, best, total, setConfig, count]);
 
   useEffect(() => {
-    if (boltStatus.enabled && count - boltStatus.currentStart >= 10) {
-      setBoltStatus({
+    if (powerupStatus.enabled && count - powerupStatus.currentStart >= 10) {
+      setPowerupStatus({
         enabled: false,
         currentStart: 0,
       });
@@ -241,12 +243,12 @@ export const GameContainer: FC = () => {
       <div className="relative">
         <div
           className="absolute top-0 left-0 w-full h-full flex items-center justify-center pointer-events-none"
-          onAnimationEnd={onBoltClose}
+          onAnimationEnd={onPowerupClose}
         >
-          {boltOpen && (
+          {powerupOpen && (
             <BsLightningFill
               size={128}
-              className="z-20 text-blue-500 bolt-fade-out pointer-events-none"
+              className="z-20 text-blue-500 powerup-fade-out pointer-events-none"
             />
           )}
         </div>
@@ -292,7 +294,7 @@ export const GameContainer: FC = () => {
         </div>
         <Modal isOpen={isFinishOpen} onClose={onFinishClose} title={'Finish'}>
           <div className="flex flex-col gap-2 w-full justify-center items-center">
-            <Text fontSize={24} as="p" color="primary" className="font-bold border border-primary/50 dark:border-primary-dark/50 bg-primary/10 dark:bg-primary-dark/10 px-2 py-1 rounded-md">
+            <Text fontSize={24} as="div" color="primary" className="font-bold border border-primary/50 dark:border-primary-dark/50 bg-primary/10 dark:bg-primary-dark/10 px-2 py-1 rounded-md">
               {gameState.status === 'lost' ? (
                 "You can't move anymore."
               ) : pendingFunction ? (
@@ -353,7 +355,9 @@ export const GameContainer: FC = () => {
                     pendingFunction();
                     setPendingFunction(null);
                   }
-                  await handleRewarding();
+                  if (totalEarnings > 0) {
+                    await handleRewarding();
+                  }
                   onResetGame();
                   onFinishClose();
                   if (user) {

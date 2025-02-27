@@ -6,7 +6,7 @@ import React, {
   useEffect,
 } from 'react';
 import {
-  TBoltStatus,
+  TPowerupStatus,
   THandleStoreSeed,
   TSeed,
   TSignIn,
@@ -23,6 +23,7 @@ import { LOCAL_URL } from '../consts/config';
 import { generateMnemonic } from 'bip39';
 import { ethers } from 'ethers';
 import { useToggle } from '../hooks/useToggle';
+import { toast } from 'react-toastify';
 
 export enum ThemeImage {
   'I2' = 2,
@@ -71,22 +72,24 @@ interface MainContextType {
   setThemeImages: (
     themeImages: Record<ThemeImage, TTileImg | undefined>,
   ) => void;
-  boltOpen: boolean;
-  onBoltClose: () => void;
-  onBoltOpen: () => void;
-  boltStatus: TBoltStatus;
-  setBoltStatus: (boltStatus: TBoltStatus) => void;
+  powerupOpen: boolean;
+  onPowerupClose: () => void;
+  onPowerupOpen: () => void;
+  powerupStatus: TPowerupStatus;
+  setPowerupStatus: (powerupStatus: TPowerupStatus) => void;
   handleUpdateUser: (updateData: Partial<TUser>) => Promise<void>;
   handleGetMaxTile: () => Promise<any>;
   handleGetMaxMove: () => Promise<any>;
   handleGetMaxScore: () => Promise<any>;
+  itemUsed: Record<string, boolean>;
+  setItemUsed: (itemUsed: Record<string, boolean>) => void;
 }
 
 const MainContext = createContext<MainContextType | undefined>(undefined);
 
 // Add a utility function for error logging
 const logError = (error: any) => {
-  console.error(error);
+  toast.error(error.response.data.message);
 };
 
 export const MainProvider: React.FC<{ children: ReactNode }> = ({
@@ -94,7 +97,7 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState<TUser | null>(null);
-  const [privateKey, setPrivateKey] = useState<string>("");
+  const [privateKey, setPrivateKey] = useState<string>('');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [token, setToken] = useLocalStorage('token', '');
   const [mnemonic, setMnemonic] = useState<string[]>([]);
@@ -117,6 +120,11 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
     2048: undefined,
     4096: undefined,
     8192: undefined,
+  });
+
+  const [itemUsed, setItemUsed] = useState<Record<string, boolean>>({
+    powerup: false,
+    upgrade: false,
   });
 
   const handleStoreSeed = async ({
@@ -271,11 +279,11 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const {
-    open: boltOpen,
-    onClose: onBoltClose,
-    onOpen: onBoltOpen,
+    open: powerupOpen,
+    onClose: onPowerupClose,
+    onOpen: onPowerupOpen,
   } = useToggle(false);
-  const [boltStatus, setBoltStatus] = useState<TBoltStatus>({
+  const [powerupStatus, setPowerupStatus] = useState<TPowerupStatus>({
     enabled: false,
     currentStart: 0,
   });
@@ -309,10 +317,10 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
   const handleRequestRewarding = async (address: String, amount: Number) => {
     const res = await api().post('./reward/send', {
       address,
-      amount
+      amount,
     });
     return res;
-  }
+  };
 
   useEffect(() => {
     if (user) {
@@ -351,15 +359,17 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
         setTheme,
         themeImages,
         setThemeImages,
-        boltOpen,
-        onBoltClose,
-        onBoltOpen,
-        boltStatus,
-        setBoltStatus,
+        powerupOpen,
+        onPowerupClose,
+        onPowerupOpen,
+        powerupStatus,
+        setPowerupStatus,
         handleUpdateUser,
         handleGetMaxTile,
         handleGetMaxMove,
         handleGetMaxScore,
+        itemUsed,
+        setItemUsed,
       }}
     >
       {children}

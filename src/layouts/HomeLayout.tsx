@@ -26,7 +26,7 @@ export const HomeLayout: React.FC<{
   return (
     <div className="min-h-screen h-full w-full bg-background dark:bg-background-dark transition-colors duration-200">
       <CustomCursor />
-      <div className="relative z-20 flex justify-center w-full h-full items-start rounded-none overflow-hidden">
+      <div className="relative z-20 flex flex-col items-center justify-center w-full h-full rounded-none overflow-hidden px-8">
         <div className="mt-6 w-full flex justify-end relative z-10 py-2">
           <Switch
             title="dark mode"

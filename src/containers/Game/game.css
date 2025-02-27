@@ -12,6 +12,6 @@
         opacity: 0;
     }
 }
-.bolt-fade-out {
+.powerup-fade-out {
     animation: fadeOut 1s forwards;
 }
