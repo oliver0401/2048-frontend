@@ -13,7 +13,6 @@ type Configuration = {
   theme: ThemeName;
 };
 
-
 export const GameLayout: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
@@ -21,7 +20,7 @@ export const GameLayout: React.FC<{
     theme: ThemeName.DEFAULT,
   });
   const [{ name: themeName }, setTheme] = useTheme(config.theme);
-  
+
   useEffect(() => {
     setConfig({ theme: themeName });
   }, [themeName, setConfig]);
@@ -31,16 +30,19 @@ export const GameLayout: React.FC<{
       <CustomCursor />
       <div className="relative z-20 flex flex-col justify-start w-full h-full items-center rounded-none overflow-hidden">
         <Navbar />
-        <div className="flex justify-start flex-col h-full items-center" style={{ width: `${GRID_SIZE}px` }}>
-          <div className="w-full flex justify-end relative z-10 py-2">
-            <Switch
-              title="dark mode"
-              checked={themeName === ThemeName.DARK}
-              activeValue={ThemeName.DARK}
-              inactiveValue={ThemeName.DEFAULT}
-              onChange={setTheme}
-            />
-          </div>
+        <div className="w-full flex justify-end relative z-10 py-2 px-4">
+          <Switch
+            title="dark mode"
+            checked={themeName === ThemeName.DARK}
+            activeValue={ThemeName.DARK}
+            inactiveValue={ThemeName.DEFAULT}
+            onChange={setTheme}
+          />
+        </div>
+        <div
+          className="flex justify-start flex-col h-full items-center"
+          style={{ width: `${GRID_SIZE}px` }}
+        >
           {children}
         </div>
         <Footer />
@@ -48,7 +50,6 @@ export const GameLayout: React.FC<{
       <img
         src={config.theme === ThemeName.DEFAULT ? LightBg : DarkBg}
         className="absolute opacity-30 left-8 top-1/2 transform -translate-y-1/2"
-
         style={{
           width: '450px',
           height: '750px',

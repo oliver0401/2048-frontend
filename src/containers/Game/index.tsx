@@ -67,18 +67,26 @@ export const GameContainer: FC = () => {
   const { total, best, count, addScore, setTotal, addCount, setCount } =
     useGameScore(config.bestScore, config.totalScore, config.count);
 
-  const { tiles, grid, onMove, onMovePending, onMergePending, breakTile, x2Tile } =
-    useGameBoard({
-      rows,
-      cols,
-      gameState,
-      addScore,
-      addCount,
-      initialGrid: config.initialGrid,
-      initialTiles: config.initialTiles,
-    });
+  const {
+    tiles,
+    grid,
+    onMove,
+    onMovePending,
+    onMergePending,
+    breakTile,
+    x2Tile,
+  } = useGameBoard({
+    rows,
+    cols,
+    gameState,
+    addScore,
+    addCount,
+    initialGrid: config.initialGrid,
+    initialTiles: config.initialTiles,
+  });
 
   const [isUserChanging, setIsUserChanging] = useState(false);
+  const [pendingFunction, setPendingFunction] = useState<Function | null>(null);
   const [isRewarding, setIsRewarding] = useState(false);
 
   const onResetGame = useCallback(() => {
@@ -118,14 +126,30 @@ export const GameContainer: FC = () => {
   }
 
   const onChangeRow = (newRows: number) => {
-    setRows(newRows);
-    setIsUserChanging(true);
+    onFinishOpen();
+    setPendingFunction(() => {
+      return () => {
+        setRows(newRows);
+        setIsUserChanging(true);
+      };
+    });
   };
 
   const onChangeCol = (newCols: number) => {
-    setCols(newCols);
-    setIsUserChanging(true);
+    onFinishOpen();
+    setPendingFunction(() => {
+      return () => {
+        setCols(newCols);
+        setIsUserChanging(true);
+      };
+    });
   };
+
+  const {
+    open: isFinishOpen,
+    onOpen: onFinishOpen,
+    onClose: onFinishClose,
+  } = useToggle(false);
 
   if (gameState.status === 'restart') {
     setTotal(0);
@@ -135,6 +159,7 @@ export const GameContainer: FC = () => {
     setGameStatus('win');
   } else if (gameState.status !== 'lost' && !canGameContinue(grid, tiles)) {
     setGameStatus('lost');
+    onFinishOpen();
   }
 
   useEffect(() => {
@@ -179,14 +204,8 @@ export const GameContainer: FC = () => {
     setIsImageLoading(true);
   }, [maxTile]);
 
-  const {
-    open: isFinishOpen,
-    onOpen: onFinishOpen,
-    onClose: onFinishClose,
-  } = useToggle(false);
-
   const totalEarnings = useMemo(
-    () => Math.floor(total * 0.01 + maxTile),
+    () => (maxTile > 1024 ? Math.floor(total * 0.01 + maxTile * 0.1) : 0),
     [total, maxTile],
   );
 
@@ -246,7 +265,7 @@ export const GameContainer: FC = () => {
             onChangeRow={onChangeRow}
             onChangeCol={onChangeCol}
             maxScaleRows={user?.rows || 4}
-            maxScaleCols={user?.rows || 4}
+            maxScaleCols={user?.cols || 4}
           />
         </div>
         <GameBoard
@@ -271,12 +290,20 @@ export const GameContainer: FC = () => {
             🕹️ Play with arrow keys or swipe
           </Text>
         </div>
-        <Modal
-          isOpen={isFinishOpen}
-          onClose={onFinishClose}
-          title="Do you really finish the game?"
-        >
+        <Modal isOpen={isFinishOpen} onClose={onFinishClose} title={'Finish'}>
           <div className="flex flex-col gap-2 w-full justify-center items-center">
+            <Text fontSize={24} as="p" color="primary" className="font-bold border border-primary/50 dark:border-primary-dark/50 bg-primary/10 dark:bg-primary-dark/10 px-2 py-1 rounded-md">
+              {gameState.status === 'lost' ? (
+                "You can't move anymore."
+              ) : pendingFunction ? (
+                'Really Change Scale?'
+              ) : (
+                <p className='text-center'>
+                  'You can continue game.
+                  <br /> Do you really finish the game?'
+                </p>
+              )}
+            </Text>
             <Text fontSize={24} as="p" color="primary" className="font-bold">
               Game Status
             </Text>
@@ -294,14 +321,6 @@ export const GameContainer: FC = () => {
               </Text>
               <Text fontSize={20} as="p" color="primary">
                 {total}
-              </Text>
-            </div>
-            <div className="w-1/2 flex items-center justify-between">
-              <Text fontSize={20} as="p" color="primary">
-                Best Score:
-              </Text>
-              <Text fontSize={20} as="p" color="primary">
-                {best}
               </Text>
             </div>
             <div className="w-1/2 flex items-center justify-between">
@@ -330,15 +349,26 @@ export const GameContainer: FC = () => {
               </Button>
               <Button
                 onClick={async () => {
+                  if(pendingFunction) {
+                    pendingFunction();
+                    setPendingFunction(null);
+                  }
                   await handleRewarding();
                   onResetGame();
                   onFinishClose();
                   if (user) {
-                    handleUpdateUser({
-                      maxScore: user.maxScore < total ? total : user.maxScore,
-                      maxTile: user.maxTile < maxTile ? maxTile : user.maxTile,
-                      maxMoves: user.maxMoves < count ? count : user.maxMoves,
-                    });
+                    if (
+                      total > user.maxScore ||
+                      count > user.maxMoves ||
+                      maxTile > user.maxTile
+                    ) {
+                      handleUpdateUser({
+                        maxScore: user.maxScore < total ? total : user.maxScore,
+                        maxTile:
+                          user.maxTile < maxTile ? maxTile : user.maxTile,
+                        maxMoves: user.maxMoves < count ? count : user.maxMoves,
+                      });
+                    }
                   }
                 }}
                 disabled={isRewarding}
