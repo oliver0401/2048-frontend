@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { IoDiamondOutline, IoHammerSharp } from 'react-icons/io5';
 import { FaBolt } from 'react-icons/fa';
 import { GiUpgrade } from 'react-icons/gi';

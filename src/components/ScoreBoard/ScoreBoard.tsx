@@ -9,7 +9,7 @@ export interface ScoreBoardProps {
 const ScoreBoard: FC<ScoreBoardProps> = ({ total, title }) => {
   const totalRef = useRef(total);
   const [score, setScore] = useState(() => total - totalRef.current || 0);
-  const { boltStatus } = useMainContext();
+  const { powerupStatus } = useMainContext();
 
   useEffect(() => {
     setScore(total - totalRef.current);
@@ -19,14 +19,14 @@ const ScoreBoard: FC<ScoreBoardProps> = ({ total, title }) => {
   return (
     <div
       className={`mx-2 py-3 w-[92px] ${
-        boltStatus.enabled && title === 'score'
+        powerupStatus.enabled && title === 'score'
           ? 'bg-blue-600'
           : 'bg-secondary dark:bg-secondary-dark'
       } flex flex-col relative justify-center items-center box-border rounded-md`}
     >
       <span
         className={`text-xs uppercase font-bold ${
-          boltStatus.enabled && title === 'score'
+          powerupStatus.enabled && title === 'score'
             ? 'text-foreground dark:text-foreground-dark'
             : 'text-tertiary dark:text-tertiary-dark'
         }`}
@@ -48,7 +48,7 @@ const ScoreBoard: FC<ScoreBoardProps> = ({ total, title }) => {
         >
           <span
             className={` ${
-              boltStatus.enabled && title === 'score'
+              powerupStatus.enabled && title === 'score'
                 ? 'text-5xl text-white font-extrabold'
                 : score > 0
                 ? 'text-lg text-primary dark:text-primary-dark font-bold'

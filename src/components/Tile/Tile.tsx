@@ -4,6 +4,7 @@ import { ThemeImage, useMainContext } from '../../context/MainContext';
 import { MOUSE } from '../../consts';
 import { useToggle } from '../../hooks/useToggle';
 import { Location } from '../../hooks/useGameBoard';
+import { GiUpgrade } from 'react-icons/gi';
 
 export interface TileProps {
   value: ThemeImage;
@@ -57,7 +58,7 @@ const Tile: FC<TileProps> = ({
     };
     return colorMap[val] || colorMap[2]; // fallback to 2 if value not found
   };
-  const { cursor, setCursor, themeImages, theme, handleUpdateUser, user } =
+  const { cursor, setCursor, themeImages, theme, handleUpdateUser, user, itemUsed, setItemUsed } =
     useMainContext();
   const { open, onOpen, onClose } = useToggle(false);
   const {
@@ -78,7 +79,8 @@ const Tile: FC<TileProps> = ({
     if (cursor === MOUSE.X2) {
       x2Tile({ r: Math.floor(y / height), c: Math.floor(x / width) });
       setCursor(MOUSE.Default);
-      handleUpdateUser({ bomb: user?.bomb ? user?.bomb - 1 : 0 });
+      handleUpdateUser({ upgrade: user?.upgrade ? user?.upgrade - 1 : 0 });
+      setItemUsed({ ...itemUsed, upgrade: true });
     }
   };
 
@@ -115,7 +117,11 @@ const Tile: FC<TileProps> = ({
           className="absolute top-0 left-0 w-full h-full z-20"
         />
       )}
-      {openX2 && <div className="bg-black/20 animate-pulse absolute top-0 left-0 w-full h-full z-20" />}
+      {openX2 && (
+        <div className="bg-black/60 text-primary/80 dark:text-primary-dark/80 animate-pulse absolute top-0 left-0 w-full h-full z-20 flex items-center justify-center">
+          <GiUpgrade className="animate-bounce" />
+        </div>
+      )}
       <div
         className={`
           w-full h-full flex items-center justify-center

@@ -66,7 +66,7 @@ export type TTheme = {
   owned: boolean;
 };
 
-export type TBoltStatus = {
+export type TPowerupStatus = {
   enabled: boolean;
   currentStart: number;
 }

@@ -54,7 +54,7 @@ export const App = () => {
           </GameProvider>
         </Web3Provider>
       </MainProvider>
-      <ToastContainer />
+      <ToastContainer autoClose={750} theme='colored' />
     </BrowserRouter>
     
   );
