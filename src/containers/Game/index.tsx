@@ -349,6 +349,10 @@ export const GameContainer: FC = () => {
               </Button>
               <Button
                 onClick={async () => {
+                  if(pendingFunction) {
+                    pendingFunction();
+                    setPendingFunction(null);
+                  }
                   await handleRewarding();
                   onResetGame();
                   onFinishClose();
