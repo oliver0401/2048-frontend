@@ -18,6 +18,7 @@ import Modal from '../../components/Modal';
 import { useToggle } from '../../hooks/useToggle';
 import { HttpStatusCode } from 'axios';
 import Button from '../../components/Button';
+import { useWeb3Context } from '../../context';
 
 export type Configuration = {
   bestScore: number;
@@ -44,6 +45,7 @@ export const GameContainer: FC = () => {
     handleRequestRewarding,
     setItemUsed,
   } = useMainContext();
+  const { getBalance } = useWeb3Context();
   const [gameState, setGameStatus] = useGameState({
     status: 'running',
     pause: false,
@@ -106,6 +108,7 @@ export const GameContainer: FC = () => {
     setIsRewarding(true);
     try {
       const res: any = await handleRequestRewarding(user?.address || "", totalEarnings);
+      await getBalance();
       switch (res.status) {
         case HttpStatusCode.Ok:
           toast.success(`${res.data.message}! \n You received ${res.data.amount} GLD tokens`, {
@@ -114,8 +117,10 @@ export const GameContainer: FC = () => {
           break;
         case HttpStatusCode.BadRequest:
           toast.warning(res.data);
+          break;
         case HttpStatusCode.InternalServerError:
           toast.error(res.data);
+          break;
         default:
           break;
       }
@@ -207,7 +212,7 @@ export const GameContainer: FC = () => {
   }, [maxTile]);
 
   const totalEarnings = useMemo(
-    () => (maxTile > 1024 ? Math.floor(total * 0.01 + maxTile * 0.1) : 0),
+    () => (maxTile > 2 ? Math.floor(total * 1000 + maxTile * 0.1) : 0),
     [total, maxTile],
   );
 

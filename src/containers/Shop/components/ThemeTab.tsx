@@ -64,8 +64,8 @@ const ThemeComponent: React.FC<ThemeComponentProps> = ({
   );
 };
 const ThemeTab: React.FC<{
-  handlePurchase: (themeId: string) => Promise<void>;
-}> = ({ handlePurchase }) => {
+  handlePurchaseModal: (themeId: string) => Promise<void>;
+}> = ({ handlePurchaseModal }) => {
   const { themes } = useThemeTab();
   return (
     <div className="w-full flex flex-col gap-2">
@@ -77,7 +77,7 @@ const ThemeTab: React.FC<{
           image={theme[2].sm}
           uuid={theme.uuid}
           owned={theme.owned}
-          handleBuyTheme={handlePurchase}
+          handleBuyTheme={handlePurchaseModal}
         />
       ))}
     </div>

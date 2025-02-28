@@ -54,7 +54,18 @@ export const App = () => {
           </GameProvider>
         </Web3Provider>
       </MainProvider>
-      <ToastContainer autoClose={750} theme='colored' />
+      <ToastContainer 
+        position="bottom-right" 
+        autoClose={5000} // Toast disappears after 3 seconds
+        hideProgressBar={false} // Show progress bar
+        newestOnTop={false} // Keep the latest toast at the bottom
+        closeOnClick
+        rtl={false} // Right to Left (for languages like Arabic)
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored" // Options: "light", "dark", "colored"        
+      />
     </BrowserRouter>
     
   );
