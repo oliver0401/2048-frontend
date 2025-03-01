@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Button from '../../components/Button';
 import { IoArrowBack } from 'react-icons/io5';
 import Tabs from '../../components/Tabs';
@@ -13,9 +13,9 @@ import { TUser } from '../../types';
 
 export const ShopContainer: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPaying, setIsPaying] = useState({item: false, rows: false, cols: false});
+  const [isPaying, setIsPaying] = useState({item: false, rows: false, cols: false, theme: false});
   const { user, handleBuyTheme, handleUpdateUser } = useMainContext();
-  const { buyItemsWithGameTokens } = useWeb3Context();
+  const { buyItemsWithGameTokens, buyThemesWithUSD } = useWeb3Context();
   const navigate = useNavigate();
 
   const handlePurchase = async (item: {
@@ -65,17 +65,35 @@ export const ShopContainer: React.FC = () => {
     } catch (error: any) {
       console.log(error);
     } finally {
-      setIsPaying({item: false, rows: false, cols: false});
+      setIsPaying({...isPaying, item: false, rows: false, cols: false});
     }
   };
 
   const [themeId, setThemeId] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
-  const handlePurchaseTheme = async (id: string) => {
+  const handlePurchaseThemeModal = async (id: string) => {
     setThemeId(id);
     setIsModalOpen(true);
   };
+
+  const handlePurchaseTheme = async () => {
+    try {
+      console.log("here");
+      setIsPaying({...isPaying, theme: true});
+      const price = 0.000001;
+      const amountInWei = Number(price * 1_000_000);
+      await buyThemesWithUSD(token, amountInWei);  
+      handleBuyTheme(themeId as string);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsPaying({...isPaying, theme: false});
+      setIsModalOpen(false);
+      setToken(null);
+      setThemeId(null);
+    }
+  }
 
   const tokens = useMemo(
     () => [
@@ -101,7 +119,7 @@ export const ShopContainer: React.FC = () => {
       },
       {
         label: 'Theme',
-        content: <ThemeTab handlePurchase={handlePurchaseTheme} />,
+        content: <ThemeTab handlePurchaseModal={handlePurchaseThemeModal}/>,
       },
     ],
     [user, isPaying],
@@ -122,7 +140,11 @@ export const ShopContainer: React.FC = () => {
       </Button>
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={async () => {
+          setIsModalOpen(false);
+          setThemeId(null);
+          setToken(null);
+        }}
         title="Purchase"
       >
         <div className="flex flex-col gap-4">
@@ -146,8 +168,8 @@ export const ShopContainer: React.FC = () => {
           <div className="text-primary dark:text-primary-dark">
             Purchase Price: <span className="font-bold">1 USDT</span>
           </div>
-          <Button onClick={() => setIsModalOpen(false)} className="w-full">
-            Purchase
+          <Button onClick={async () => handlePurchaseTheme()} className="w-full" disabled={token === null || isPaying.theme}>
+            {!isPaying.theme ? "Purchase" : "Processing"}
           </Button>
         </div>
       </Modal>

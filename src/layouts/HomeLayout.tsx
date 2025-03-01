@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GRID_SIZE } from '../utils/constants';
 import Switch from '../components/Switch';
 import useLocalStorage from '../hooks/useLocalStorage';
@@ -7,6 +7,7 @@ import { ThemeName } from '../themes/types';
 import LightBg from '../assets/img/landing-light.png';
 import DarkBg from '../assets/img/landing-dark.png';
 import CustomCursor from '../components/Cursor';
+import { useWeb3Context } from '../context';
 type Configuration = {
   theme: ThemeName;
 };
@@ -19,6 +20,9 @@ export const HomeLayout: React.FC<{
   });
   const [{ name: themeName }, setTheme] = useTheme(config.theme);
 
+  const { userBalance, setUserBalance, getUserGameTokenBalance } = useWeb3Context();
+  useEffect(() => { console.log("userBalance", userBalance) }, [userBalance]);
+
   useEffect(() => {
     setConfig({ theme: themeName });
   }, [themeName, setConfig]);
@@ -28,6 +32,7 @@ export const HomeLayout: React.FC<{
       <CustomCursor />
       <div className="relative z-20 flex flex-col items-center justify-center w-full h-full rounded-none overflow-hidden px-8">
         <div className="mt-6 w-full flex justify-end relative z-10 py-2">
+          <span style={{ color: 'white' }}>{userBalance?.toString() || "Loading"}</span>
           <Switch
             title="dark mode"
             checked={themeName === ThemeName.DARK}

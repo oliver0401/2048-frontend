@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GRID_SIZE } from '../utils/constants';
 import Switch from '../components/Switch';
 import useLocalStorage from '../hooks/useLocalStorage';
@@ -9,6 +9,7 @@ import DarkBg from '../assets/img/landing-dark.png';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CustomCursor from '../components/Cursor';
+import { useWeb3Context } from '../context';
 type Configuration = {
   theme: ThemeName;
 };
@@ -20,6 +21,8 @@ export const GameLayout: React.FC<{
     theme: ThemeName.DEFAULT,
   });
   const [{ name: themeName }, setTheme] = useTheme(config.theme);
+  const { userBalance, setUserBalance, getUserGameTokenBalance } = useWeb3Context();
+  useEffect(() => { console.log("userBalance", userBalance) }, [userBalance]);
 
   useEffect(() => {
     setConfig({ theme: themeName });
@@ -31,6 +34,7 @@ export const GameLayout: React.FC<{
       <div className="relative z-20 flex flex-col justify-start w-full h-full items-center rounded-none overflow-hidden">
         <Navbar />
         <div className="w-full flex justify-end relative z-10 py-2 px-4">
+          <span style={{color: 'white'}}>{userBalance?.toString()}</span>
           <Switch
             title="dark mode"
             checked={themeName === ThemeName.DARK}

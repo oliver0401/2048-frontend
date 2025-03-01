@@ -29,22 +29,29 @@ const BorderSizeTab: React.FC<BorderSizeTabProps> = ({ user, handlePurchase, isP
           </p>
         </div>
         <div className="flex justify-end w-full">
-          <button
-            onClick={() => {
-              if(isPaying.cols || isPaying.rows) return;
-              handlePurchase({
-                name: 'Row Expansion',
-                price: 100 * 2 ** user.rows,
-                type: 'border-rows',
-                quantity: user.rows
-              })
-            }}
-            disabled={isPaying.rows}
-            className="hover:scale-105 bg-transparent disabled:border-primary/50 dark:disabled:border-primary-dark/50 disabled:text-primary/50 dark:disabled:text-primary-dark/50 transition-transform max-w-min flex items-center gap-2 text-nowrap font-bold text-primary-dark dark:text-primary-dark border-2 border-primary-dark dark:border-primary-dark rounded-md px-2 py-1"
-          >
-            {!isPaying.rows ? `Get For: ${user?.rows && 100 * 2 ** user.rows}` : "Processing..."}
-            <IoDiamondOutline size={20} />
-          </button>
+          {
+            user?.rows < 8 ?
+            (<button
+              onClick={() => {
+                if(isPaying.cols || isPaying.rows) return;
+                handlePurchase({
+                  name: 'Row Expansion',
+                  price: 100 * 2 ** user.rows,
+                  type: 'border-rows',
+                  quantity: user.rows
+                })
+              }}
+              disabled={isPaying.rows}
+              className="hover:scale-105 bg-transparent disabled:border-primary/50 dark:disabled:border-primary-dark/50 disabled:text-primary/50 dark:disabled:text-primary-dark/50 transition-transform max-w-min flex items-center gap-2 text-nowrap font-bold text-primary-dark dark:text-primary-dark border-2 border-primary-dark dark:border-primary-dark rounded-md px-2 py-1"
+            >
+              {!isPaying.rows ? `Get For: ${user?.rows && 100 * 2 ** user.rows}` : "Processing..."}
+              <IoDiamondOutline size={20} />
+            </button>) :
+            (<span>
+              You reached limit
+            </span>)
+          }
+          
         </div>
       </div>
       {/* Column Expansion */}
@@ -59,22 +66,28 @@ const BorderSizeTab: React.FC<BorderSizeTabProps> = ({ user, handlePurchase, isP
           </p>
         </div>
         <div className="flex justify-end w-full">
-          <button
-            onClick={() => {
-              if (isPaying.cols || isPaying.rows) return;
-              handlePurchase({
-                name: 'Row Expansion',
-                price: 100 * 2 ** user.cols,
-                type: 'border-cols',
-                quantity: user.cols
-              })
-            }}
-            disabled={isPaying.cols}
-            className="disabled:border-primary/50 dark:disabled:border-primary-dark/50 disabled:text-primary/50 dark:disabled:text-primary-dark/50 hover:scale-105 bg-transparent transition-transform max-w-min flex items-center gap-2 text-nowrap font-bold text-primary-dark dark:text-primary-dark border-2 border-primary-dark dark:border-primary-dark rounded-md px-2 py-1"
-          >
-            {!isPaying.cols ? `Get For: ${user?.cols && 100 * 2 ** user.cols}` : "Processing..."}
-            <IoDiamondOutline size={20} />
-          </button>
+          {
+            user?.cols < 8 ?
+            (<button
+              onClick={() => {
+                if (isPaying.cols || isPaying.rows) return;
+                handlePurchase({
+                  name: 'Col Expansion',
+                  price: 100 * 2 ** user.cols,
+                  type: 'border-cols',
+                  quantity: user.cols
+                })
+              }}
+              disabled={isPaying.cols}
+              className="disabled:border-primary/50 dark:disabled:border-primary-dark/50 disabled:text-primary/50 dark:disabled:text-primary-dark/50 hover:scale-105 bg-transparent transition-transform max-w-min flex items-center gap-2 text-nowrap font-bold text-primary-dark dark:text-primary-dark border-2 border-primary-dark dark:border-primary-dark rounded-md px-2 py-1"
+            >
+              {!isPaying.cols ? `Get For: ${user?.cols && 100 * 2 ** user.cols}` : "Processing..."}
+              <IoDiamondOutline size={20} />
+            </button>) :
+            (<span>
+              You reached limit
+            </span>)
+          }
         </div>
       </div>
     </div>
