@@ -18,6 +18,7 @@ import { BsShop } from 'react-icons/bs';
 import { VscSignOut } from 'react-icons/vsc';
 import { useToggle } from '../../hooks/useToggle';
 import { ThemeSelectModal } from './ThemeSelectModal';
+import { useWeb3Context } from '../../context';
 
 const Navbar: React.FC = () => {
   const { user, handleSignOut } = useMainContext();
@@ -28,7 +29,7 @@ const Navbar: React.FC = () => {
     onClose: onThemeClose,
   } = useToggle(false);
   const navigate = useNavigate();
-
+  const { userBalance } = useWeb3Context();
   const { onClick, content } = useClipboard(
     user?.address || '',
     <HiOutlineClipboardDocument className="text-primary dark:text-primary-dark" />,
@@ -120,6 +121,9 @@ const Navbar: React.FC = () => {
           </Text>
           {content}
         </div>
+        <Text as="span" color="primary" fontSize={16} className="font-bold">
+          {userBalance?.toString()} DWAT
+        </Text>
       </div>
       <ThemeSelectModal isOpen={themeOpen} onClose={onThemeClose} />
     </div>

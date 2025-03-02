@@ -58,10 +58,10 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const getBalance = async () => {
         const userbal = await getUserGameTokenBalance();
-        const rewardbal = await getRewardContractGameTokenBalance();
+        await getRewardContractGameTokenBalance();
         setUserBalance(userbal);
-        toast.info(String(userbal));
-        toast.info(String(rewardbal));
+        // toast.info(String(userbal));
+        // toast.info(String(rewardbal));
     }
 
     const getContracts = () => {
@@ -262,7 +262,7 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 }
 
                 const signedTx = await web3_2.eth.accounts.signTransaction(paymentTransaction, account.privateKey);
-                const receipt = await web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
+                await web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
                 toast.success("Paid successfully!");
             } catch (error: any) {
                 console.error("Transaction failed:", error);
@@ -281,11 +281,14 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const getProviderUrl = (network: string) => {
         switch (network) {
-            case 'busdt' || 'busdc':
+            case 'busdt':
+            case 'busdc':
                 return CONFIG.BNB_PROVIDER_URL;
-            case 'ausdt' || 'ausdc':
+            case 'ausdt':
+            case 'ausdc':
                 return CONFIG.ABT_PROVIDER_URL;
-            case 'pusdt' || 'pusdc':
+            case 'pusdt':
+            case 'pusdc':
                 return CONFIG.POL_PROVIDER_URL;
             default:
                 return CONFIG.FUSE_PROVIDER_URL;

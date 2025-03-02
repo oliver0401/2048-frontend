@@ -116,17 +116,17 @@ export const GameContainer: FC = () => {
           });
           break;
         case HttpStatusCode.BadRequest:
-          toast.warning(res.data);
+          // toast.warning(res.data);
           break;
         case HttpStatusCode.InternalServerError:
-          toast.error(res.data);
+          // toast.error(res.data);
           break;
         default:
           break;
       }
     } catch (err: any) {
       console.log(err);
-      toast.error(err.message);
+      // toast.error(err.message);
     } finally {
       setIsRewarding(false);
     }
@@ -212,7 +212,7 @@ export const GameContainer: FC = () => {
   }, [maxTile]);
 
   const totalEarnings = useMemo(
-    () => (maxTile > 2 ? Math.floor(total * 1000 + maxTile * 0.1) : 0),
+    () => (maxTile > 2 ? Math.floor(total * 0.01 + maxTile * 0.1) : 0),
     [total, maxTile],
   );
 

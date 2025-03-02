@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import Text from '../../components/Text';
 import { useMainContext } from '../../context/MainContext';
 import {
@@ -22,11 +22,14 @@ import { DropDown } from '../../components/DropDown';
 import { TOption, TToken } from '../../types';
 import { useDropDown } from '../../hooks/useDropDown';
 import arbitrum from '../../assets/svg/arbitrum.svg';
-import hrks from '../../assets/img/hrks.png';
+import dwat from '../../assets/img/hrks.png';
+import fuse from '../../assets/svg/fuse.svg';
+import { useWeb3Context } from '../../context';
 
 export const WalletContainer: React.FC = () => {
   const { user } = useMainContext();
   const navigate = useNavigate();
+  const { userBalance } = useWeb3Context();
   const { onClick, content } = useClipboard(
     user?.address || '',
     <HiOutlineClipboardDocument
@@ -53,6 +56,15 @@ export const WalletContainer: React.FC = () => {
 
   const networks: TOption[] = useMemo(
     () => [
+      {
+        label: (
+          <div className="flex items-center gap-2 text-cyan-500 text-[16px]">
+            <img src={fuse} alt="fuse" className="w-6 h-6" />
+            Fuse Mainnet
+          </div>
+        ),
+        value: 'fus',
+      },
       {
         label: (
           <div className="flex items-center gap-2 text-purple-500 text-[16px]">
@@ -95,25 +107,52 @@ export const WalletContainer: React.FC = () => {
 
   const { selectedOption, onSelect } = useDropDown(networks);
 
-  const tokens: Record<'pol' | 'eth' | 'bnb' | 'arb', TToken[]> = useMemo(
+  const tokens = useMemo<
+    Record<'fus' | 'eth' | 'bnb' | 'arb' | 'pol', TToken[]>
+  >(
     () => ({
-      pol: [
-        TOKEN.POL,
-        {
-          unit: 'HRKS',
-          icon: <img src={hrks} alt="hrks" className="w-8 h-8" />,
-          endpoint: '0x5A534988535cf27a70e74dFfe299D06486f185B7',
-          name: 'hrks',
-        },
-        TOKEN.PUSDT,
-        TOKEN.PUSDC,
-      ],
+      pol: [TOKEN.POL, TOKEN.PUSDT, TOKEN.PUSDC],
       eth: [TOKEN.ETH, TOKEN.EUSDT, TOKEN.EUSDC],
       bnb: [TOKEN.BNB, TOKEN.BUSDT, TOKEN.BUSDC],
       arb: [TOKEN.ARB, TOKEN.AUSDT, TOKEN.AUSDC],
+      fus: [
+        {
+          unit: 'DWAT',
+          icon: <img src={dwat} alt="dwat" className="w-8 h-8" />,
+          balance: async (_address: string) => {
+            return userBalance ? userBalance.toString() : '0';
+          },
+          name: 'dwat',
+        },
+        TOKEN.FUSE,
+        TOKEN.FUSDT,
+        TOKEN.FUSDC,
+      ],
     }),
     [],
   );
+
+  // Add this state to store balances for all tokens
+  const [balances, setBalances] = useState<Record<string, string>>({});
+
+  // Move the useEffect outside of the map
+  useEffect(() => {
+    const fetchBalances = async () => {
+      const network = selectedOption.value as 'fus' | 'eth' | 'bnb' | 'arb' | 'pol';
+      const currentTokens = tokens[network];
+      
+      const newBalances: Record<string, string> = {};
+      for (const token of currentTokens) {
+        const balance = await token.balance(user?.address || '');
+        newBalances[token.unit] = balance;
+      }
+      setBalances(newBalances);
+    };
+
+    if (user?.address) {
+      fetchBalances();
+    }
+  }, [selectedOption.value, user?.address, tokens]);
 
   return (
     <div className="w-full h-full flex flex-col gap-4 justify-start items-start p-10">
@@ -131,13 +170,15 @@ export const WalletContainer: React.FC = () => {
         </div>
       </div>
 
-      {tokens[selectedOption.value as 'pol' | 'eth' | 'bnb'].map(
+      {tokens[selectedOption.value as 'fus' | 'eth' | 'bnb' | 'arb' | 'pol'].map(
         (token, idx) => (
           <RenderField
             key={idx}
             label={token.icon}
             value={
-              <span className="text-lg text-blue-500">0 {token.unit}</span>
+              <span className="text-lg text-blue-500">
+                {balances[token.unit] || '0'} {token.unit}
+              </span>
             }
           />
         ),
