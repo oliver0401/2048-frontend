@@ -79,8 +79,8 @@ export type TOption = {
 export type TToken = {
   name: string;
   icon: React.ReactNode;
-  endpoint: string;
   unit: string;
+  balance: (address: string) => Promise<string>;
 }
 
 

@@ -2,13 +2,16 @@ import React from 'react';
 import { SiTether, SiPolygon, SiBinance, SiEthereum } from 'react-icons/si';
 import USDC from '../assets/svg/usdc.svg';
 import ARBITRUM from '../assets/svg/arbitrum.svg';
+import FUS from '../assets/svg/fuse.svg';
 import { TToken } from '../types';
+import axios from 'axios';
 
 export const API_KEY = {
   ETH: 'R8IKIIPAJKC9TZDCV3W17N62VZ99BZJD87',
   POL: 'FQTFJ3SZY4726GDTT83ZIYJHY21TJS5WXI',
   BNB: 'I4WZIXVBR7KRTNZY1P6VIGEN29R2U737MK',
   ARB: '6KVU5REZUYBQCC8KR573YF7I91NY98BEIN',
+  FUSE: '83267ee1-fdd9-4800-891b-786ab1c7ec63',
 };
 
 export const CONTRACT_ADDRESS = {
@@ -20,6 +23,8 @@ export const CONTRACT_ADDRESS = {
   AUSDC: '0xaf88d065e77c8cc2239327c5edb3a432268e5831',
   BUSDT: '0x55d398326f99059fF775485246999027B3197955',
   BUSDC: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
+  FUSDT: '0xFaDbBF8Ce7D5b7041bE672561bbA99f79c532e10',
+  FUSDC: '0x620fd5fa44BE6af63715Ef4E65DDFA0387aD13F5',
 };
 
 export const CONTRACT_ABI = {
@@ -38,34 +43,55 @@ export const BASEURL = {
   POL: 'https://api.polygonscan.com/api',
   BNB: 'https://api.bscscan.com/api',
   ARB: 'https://api.arbiscan.io/api',
+  FUSE: 'https://explorer.fuse.io/api/v2',
 };
 
 export const ETH: TToken = {
   unit: 'ETH',
   icon: <SiEthereum className="text-blue-500" size={32} />,
   name: 'eth',
-  endpoint: `${BASEURL.ETH}?module=account&action=balance&apikey=${API_KEY.ETH}`,
+  balance: async (address: string) => {
+    const response = await axios.get(
+      `${BASEURL.ETH}?module=account&action=balance&apikey=${API_KEY.ETH}&address=${address}`,
+    );
+    return (Number(response.data.result) / 10 ** 18).toFixed(5);
+  },
 };
 
 export const POL: TToken = {
   unit: 'POL',
   icon: <SiPolygon className="text-purple-500" size={32} />,
   name: 'pol',
-  endpoint: `${BASEURL.POL}?module=account&action=balance&apikey=${API_KEY.POL}`,
+  balance: async (address: string) => {
+    const response = await axios.get(
+      `${BASEURL.POL}?module=account&action=balance&apikey=${API_KEY.POL}&address=${address}`,
+    );
+    return (Number(response.data.result) / 10 ** 18).toFixed(5);
+  },
 };
 
 export const BNB: TToken = {
   unit: 'BNB',
   icon: <SiBinance className="text-yellow-500" size={32} />,
   name: 'bnb',
-  endpoint: `${BASEURL.BNB}?module=account&action=balance&apikey=${API_KEY.BNB}`,
+  balance: async (address: string) => {
+    const response = await axios.get(
+      `${BASEURL.BNB}?module=account&action=balance&apikey=${API_KEY.BNB}&address=${address}`,
+    );
+    return (Number(response.data.result) / 10 ** 18).toFixed(5);
+  },
 };
 
 export const ARB: TToken = {
   unit: 'ARB',
   icon: <img src={ARBITRUM} className="w-8 h-8" />,
   name: 'arb',
-  endpoint: `${BASEURL.ARB}?module=account&action=balance&apikey=${API_KEY.ARB}`,
+  balance: async (address: string) => {
+    const response = await axios.get(
+      `${BASEURL.ARB}?module=account&action=balance&apikey=${API_KEY.ARB}&address=${address}`,
+    );
+    return (Number(response.data.result) / 10 ** 18).toFixed(5);
+  },
 };
 
 export const PUSDT: TToken = {
@@ -80,7 +106,12 @@ export const PUSDT: TToken = {
     </div>
   ),
   name: 'pusdt',
-  endpoint: `${BASEURL.POL}?module=account&action=balance&apikey=${API_KEY.POL}&contractaddress=${CONTRACT_ADDRESS.PUSDT}`,
+  balance: async (address: string) => {
+    const response = await axios.get(
+      `${BASEURL.POL}?module=account&action=balance&apikey=${API_KEY.POL}&contractaddress=${CONTRACT_ADDRESS.PUSDT}&address=${address}`,
+    );
+    return (Number(response.data.result) / 10 ** 18).toFixed(5);
+  },
 };
 
 export const BUSDT: TToken = {
@@ -95,7 +126,12 @@ export const BUSDT: TToken = {
     </div>
   ),
   name: 'busdt',
-  endpoint: `${BASEURL.BNB}?module=account&action=balance&apikey=${API_KEY.BNB}&contractaddress=${CONTRACT_ADDRESS.BUSDT}`,
+  balance: async (address: string) => {
+    const response = await axios.get(
+      `${BASEURL.BNB}?module=account&action=balance&apikey=${API_KEY.BNB}&contractaddress=${CONTRACT_ADDRESS.BUSDT}&address=${address}`,
+    );
+    return (Number(response.data.result) / 10 ** 18).toFixed(5);
+  },
 };
 
 export const EUSDT: TToken = {
@@ -110,7 +146,12 @@ export const EUSDT: TToken = {
     </div>
   ),
   name: 'eusdt',
-  endpoint: `${BASEURL.ETH}?module=account&action=balance&apikey=${API_KEY.ETH}&contractaddress=${CONTRACT_ADDRESS.EUSDT}`,
+  balance: async (address: string) => {
+    const response = await axios.get(
+      `${BASEURL.ETH}?module=account&action=balance&apikey=${API_KEY.ETH}&contractaddress=${CONTRACT_ADDRESS.EUSDT}&address=${address}`,
+    );
+    return (Number(response.data.result) / 10 ** 18).toFixed(5);
+  },
 };
 
 export const PUSDC: TToken = {
@@ -125,7 +166,12 @@ export const PUSDC: TToken = {
     </div>
   ),
   name: 'pusdc',
-  endpoint: `${BASEURL.POL}?module=account&action=balance&apikey=${API_KEY.POL}&contractaddress=${CONTRACT_ADDRESS.PUSDC}`,
+  balance: async (address: string) => {
+    const response = await axios.get(
+      `${BASEURL.POL}?module=account&action=balance&apikey=${API_KEY.POL}&contractaddress=${CONTRACT_ADDRESS.PUSDC}&address=${address}`,
+    );
+    return (Number(response.data.result) / 10 ** 18).toFixed(5);
+  },
 };
 
 export const BUSDC: TToken = {
@@ -140,7 +186,12 @@ export const BUSDC: TToken = {
     </div>
   ),
   name: 'busdc',
-  endpoint: `${BASEURL.BNB}?module=account&action=balance&apikey=${API_KEY.BNB}&contractaddress=${CONTRACT_ADDRESS.BUSDC}`,
+  balance: async (address: string) => {
+    const response = await axios.get(
+      `${BASEURL.BNB}?module=account&action=balance&apikey=${API_KEY.BNB}&contractaddress=${CONTRACT_ADDRESS.BUSDC}&address=${address}`,
+    );
+    return (Number(response.data.result) / 10 ** 18).toFixed(5);
+  },
 };
 
 export const EUSDC: TToken = {
@@ -155,11 +206,16 @@ export const EUSDC: TToken = {
     </div>
   ),
   name: 'eusdc',
-  endpoint: `${BASEURL.ETH}?module=account&action=balance&apikey=${API_KEY.ETH}&contractaddress=${CONTRACT_ADDRESS.EUSDC}`,
+  balance: async (address: string) => {
+    const response = await axios.get(
+      `${BASEURL.ETH}?module=account&action=balance&apikey=${API_KEY.ETH}&contractaddress=${CONTRACT_ADDRESS.EUSDC}&address=${address}`,
+    );
+    return (Number(response.data.result) / 10 ** 18).toFixed(5);
+  },
 };
 
 export const AUSDT: TToken = {
-  unit: 'USDC',
+  unit: 'USDT',
   icon: (
     <div className="relative">
       <SiTether className="text-green-500" size={32} />
@@ -170,7 +226,12 @@ export const AUSDT: TToken = {
     </div>
   ),
   name: 'ausdt',
-  endpoint: `${BASEURL.ARB}?module=account&action=balance&apikey=${API_KEY.ARB}&contractaddress=${CONTRACT_ADDRESS.AUSDT}`,
+  balance: async (address: string) => {
+    const response = await axios.get(
+      `${BASEURL.ARB}?module=account&action=balance&apikey=${API_KEY.ARB}&contractaddress=${CONTRACT_ADDRESS.AUSDT}&address=${address}`,
+    );
+    return (Number(response.data.result) / 10 ** 18).toFixed(5);
+  },
 };
 
 export const AUSDC: TToken = {
@@ -185,5 +246,69 @@ export const AUSDC: TToken = {
     </div>
   ),
   name: 'eusdc',
-  endpoint: `${BASEURL.ARB}?module=account&action=balance&apikey=${API_KEY.ARB}&contractaddress=${CONTRACT_ADDRESS.AUSDC}`,
+  balance: async (address: string) => {
+    const response = await axios.get(
+      `${BASEURL.ARB}?module=account&action=balance&apikey=${API_KEY.ARB}&contractaddress=${CONTRACT_ADDRESS.AUSDC}&address=${address}`,
+    );
+    return (Number(response.data.result) / 10 ** 18).toFixed(5);
+  },
+};
+
+export const FUSE: TToken = {
+  unit: 'FUSE',
+  icon: <img src={FUS} className="w-8 h-8" />,
+  name: 'fuse',
+  balance: async (address: string) => {
+    if (!address) return '0';
+    const response = await axios.get(
+      `${BASEURL.FUSE}/addresses/${address}?apikey=${API_KEY.FUSE}`,
+    );
+    return (Number(response.data.coin_balance) / 10 ** 18).toFixed(5);
+  },
+};
+
+export const FUSDT: TToken = {
+  unit: 'USDT',
+  icon: (
+    <div className="relative">
+      <SiTether className="text-green-500" size={32} />
+      <img
+        src={FUS}
+        className="absolute -bottom-1 -right-2 rounded-full w-4 h-4"
+      />
+    </div>
+  ),
+  name: 'fusdt',
+  balance: async (address: string) => {
+    if (!address) return '0';
+    const { data } = await axios.get(
+      `${BASEURL.FUSE}/addresses/${address}/tokens?apikey=${API_KEY.FUSE}&type=ERC-20`,
+    );
+    const items: any[] = data.items;
+    const item = items.find((item: any) => item.token.symbol === 'USDT');
+    return (Number(item?.value || 0) / 10 ** 18).toFixed(5);
+  },
+};
+
+export const FUSDC: TToken = {
+  unit: 'USDC',
+  icon: (
+    <div className="relative">
+      <img src={USDC} className="w-8 h-8" />
+      <img
+        src={FUS}
+        className="absolute -bottom-1 -right-2 rounded-full w-4 h-4"
+      />
+    </div>
+  ),
+  name: 'fusdc',
+  balance: async (address: string) => {
+    if (!address) return '0';
+    const { data } = await axios.get(
+      `${BASEURL.FUSE}/addresses/${address}/tokens?apikey=${API_KEY.FUSE}&type=ERC-20`,
+    );
+    const items: any[] = data.items;
+    const item = items.find((item: any) => item.token.symbol === 'USDC');
+    return (Number(item?.value || 0) / 10 ** 18).toFixed(5);
+  },
 };

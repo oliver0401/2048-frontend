@@ -246,9 +246,11 @@ const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGr
 
     if (initialGrid && initialTiles) {
       // Validate grid dimensions
+      console.log("initialGrid", initialGrid);
+      console.log("initialTiles", initialTiles);
       if (initialGrid.length !== rows || initialGrid[0].length !== cols) {
         console.warn('Invalid initialGrid dimensions, falling back to default initialization');
-        return initializeDefaultBoard(rows, cols);
+        return initializeEmptyBoard(rows, cols);
       }
 
       // Validate that all tiles in initialTiles exist in initialGrid
@@ -264,7 +266,8 @@ const useGameBoard = ({ rows, cols, gameState, addScore, initialTiles, initialGr
       grid = initialGrid.map(row => [...row]);
       tiles = initialTiles.map(tile => ({ ...tile }));
     } else {
-      return initializeDefaultBoard(rows, cols);
+      return initializeEmptyBoard(rows, cols);
+      // return initializeDefaultBoard(rows, cols);
     }
 
     return { grid, tiles };
@@ -404,6 +407,12 @@ const initializeDefaultBoard = (rows: number, cols: number) => {
   tiles.forEach((tile) => {
     grid[tile.r][tile.c] = tile;
   });
+  return { grid, tiles };
+};
+
+const initializeEmptyBoard = (rows: number, cols: number) => {
+  const grid = create2DArray<Cell>(rows, cols);
+  const tiles: Tile[] = [];
   return { grid, tiles };
 };
 
