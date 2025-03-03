@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import type { VitePWAOptions } from 'vite-plugin-pwa';
 import path from 'path';
+import fs from 'fs';
 /* eslint-enable import/no-extraneous-dependencies */
 
 const pwaOptions: Partial<VitePWAOptions> = {
@@ -42,6 +43,10 @@ export default defineConfig(({ mode }) => {
     base: './',
     server: {
       port: 3000,
+      https: {
+        key: fs.readFileSync(path.resolve(__dirname, 'server.key')),
+        cert: fs.readFileSync(path.resolve(__dirname, 'server.crt')),
+      },
     },
     plugins,
     build: {

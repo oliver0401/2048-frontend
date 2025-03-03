@@ -212,7 +212,7 @@ export const GameContainer: FC = () => {
   }, [maxTile]);
 
   const totalEarnings = useMemo(
-    () => (maxTile > 2 ? Math.floor(total * 1000 + maxTile * 0.1) : 0),
+    () => (maxTile > 64 ? Math.floor(total * 0.1 + maxTile * 0.1) : 0),
     [total, maxTile],
   );
 

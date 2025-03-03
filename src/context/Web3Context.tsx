@@ -60,8 +60,6 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const userbal = await getUserGameTokenBalance();
         const rewardbal = await getRewardContractGameTokenBalance();
         setUserBalance(userbal);
-        toast.info(String(userbal));
-        toast.info(String(rewardbal));
     }
 
     const getContracts = () => {
@@ -158,13 +156,14 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 // Check the decimals of the token
                 const decimals = await contract.methods.decimals().call();
                 const amountInSmallestUnit = web3_2.utils.toBigInt(
-                    BigInt(amount) * BigInt(10 ** Number(decimals)) / BigInt(10 ** 2)
+                    amount * 10 ** Number(decimals)
                 );
+                console.log(amountInSmallestUnit);
 
                 // Now transfer the tokens
                 const balanceOfUser: bigint = await contract.methods.balanceOf(account.address).call();
                 const balanceOfServer: bigint = await contract.methods.balanceOf(receiverAddress).call();
-                toast.info(`UserBalance: ${balanceOfUser} / ServerBalance: ${balanceOfServer} / amount: ${BigInt(amount)}`);
+                console.log(`UserBalance: ${balanceOfUser} / ServerBalance: ${balanceOfServer} / amount: ${BigInt(amountInSmallestUnit)}`);
                 const transferData = contract.methods.transfer(receiverAddress, amountInSmallestUnit).encodeABI();
 
                 const gasPrice: bigint = await web3_2.eth.getGasPrice();

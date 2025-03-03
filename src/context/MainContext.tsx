@@ -65,7 +65,7 @@ interface MainContextType {
   themes: TTheme[];
   setThemes: (themes: TTheme[]) => void;
   handleGetThemes: () => Promise<void>;
-  handleBuyTheme: (themeId: string) => Promise<void>;
+  handleBuyTheme: (themeId: string, txData: object) => Promise<void>;
   theme: string;
   setTheme: (theme: string) => void;
   themeImages: Record<ThemeImage, TTileImg | undefined>;
@@ -249,8 +249,8 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
     const { data } = await api().get('/themes');
     return data;
   };
-  const buyTheme = async (themeId: string) => {
-    const { data } = await api().post(`/themes/buy`, { themeId });
+  const buyTheme = async (themeId: string, txData: object) => {
+    const { data } = await api().post(`/themes/buy`, { themeId, txData });
     return data;
   };
 
@@ -265,9 +265,10 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const handleBuyTheme = async (themeId: string) => {
+  const handleBuyTheme = async (themeId: string, txData: object) => {
     try {
-      await buyTheme(themeId);
+      await buyTheme(themeId, txData);
+      toast.success("Theme Purchased Successfully!");
       setThemes(
         themes.map((theme) =>
           theme.uuid === themeId ? { ...theme, owned: true } : theme,

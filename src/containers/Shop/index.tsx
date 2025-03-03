@@ -3,13 +3,22 @@ import Button from '../../components/Button';
 import { IoArrowBack } from 'react-icons/io5';
 import Tabs from '../../components/Tabs';
 import { useMainContext, useWeb3Context } from '../../context';
-import { PATH, TOKEN } from '../../consts';
+import { CONFIG, PATH, TOKEN } from '../../consts';
 import ItemsTab from './components/ItemsTab'; // Import the new ItemsTab component
 import BorderSizeTab from './components/BorderSizeTab'; // Import the new BorderSizeTab component
 import ThemeTab from './components/ThemeTab'; // Import the new ThemeTab component
 import { useNavigate } from 'react-router-dom';
 import Modal from '../../components/Modal';
 import { TUser } from '../../types';
+
+interface TransactionData {
+  txHash: string;
+  tokenType: string | "USDT" | "USDC";
+  network: string | "binance" | "arbitrum" | "polygon";
+  fromAddr: string;
+  toAddr: string;
+  amount: number;
+}
 
 export const ShopContainer: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,10 +90,32 @@ export const ShopContainer: React.FC = () => {
     try {
       console.log("here");
       setIsPaying({...isPaying, theme: true});
-      const price = 0.000001;
-      const amountInWei = Number(price * 1_000_000);
-      await buyThemesWithUSD(token, amountInWei);  
-      handleBuyTheme(themeId as string);
+      const price = 0.0001;
+      const receipt = await buyThemesWithUSD(token, price);
+      console.log(receipt);
+      // if (receipt) {
+      //   let network = "fuse";
+      //   switch(token?.substring(0, 1)) {
+      //     case 'b':
+      //       network = "binance"
+      //       break;
+      //     case 'p':
+      //       network = "polygon"
+      //       break;
+      //     case 'a':
+      //       network = "arbitrum"
+      //       break;
+      //   }
+      //   const txData: TransactionData = {
+      //     txHash: receipt.transactionHash,
+      //     tokenType: token?.substring(1).toUpperCase() || "",
+      //     network: network,
+      //     fromAddr: user?.address as any,
+      //     toAddr: CONFIG.RECEIVER_ADDRESS,
+      //     amount: price,      
+      //   };
+      //   handleBuyTheme(themeId as string, txData);
+      // }
     } catch (error) {
       console.error(error);
     } finally {

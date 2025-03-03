@@ -184,6 +184,6 @@ export const AUSDC: TToken = {
       />
     </div>
   ),
-  name: 'eusdc',
+  name: 'ausdc',
   endpoint: `${BASEURL.ARB}?module=account&action=balance&apikey=${API_KEY.ARB}&contractaddress=${CONTRACT_ADDRESS.AUSDC}`,
 };
