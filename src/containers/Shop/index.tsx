@@ -97,12 +97,18 @@ export const ShopContainer: React.FC = () => {
 
   const tokens = useMemo(
     () => [
+      TOKEN.FUSDT,
       TOKEN.PUSDT,
       TOKEN.BUSDT,
       TOKEN.AUSDT,
+      TOKEN.FUSDC,
       TOKEN.PUSDC,
       TOKEN.BUSDC,
       TOKEN.AUSDC,
+      TOKEN.FUSE,
+      TOKEN.POL,
+      TOKEN.BNB,
+      TOKEN.ARB,
     ],
     [],
   );
@@ -148,13 +154,13 @@ export const ShopContainer: React.FC = () => {
         title="Purchase"
       >
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             {tokens.map((tk) => (
               <div
                 key={tk.name}
                 onClick={() => setToken(tk.name)}
                 className={`flex items-center justify-center gap-4 p-3 rounded-md ${token === tk.name
-                  ? 'border-2 border-primary/50 dark:border-primary-dark/50'
+                  ? 'border-2 border-primary/50 dark:border-primary-dark/50 bg-primary/30 dark:bg-primary-dark/30'
                   : 'border border-primary/50 dark:border-primary-dark/50 hover:bg-primary/5 dark:hover:bg-primary-dark/5'
                   } transition-all`}
               >
