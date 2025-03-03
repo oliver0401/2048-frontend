@@ -88,34 +88,33 @@ export const ShopContainer: React.FC = () => {
 
   const handlePurchaseTheme = async () => {
     try {
-      console.log("here");
       setIsPaying({...isPaying, theme: true});
       const price = 0.0001;
       const receipt = await buyThemesWithUSD(token, price);
       console.log(receipt);
-      // if (receipt) {
-      //   let network = "fuse";
-      //   switch(token?.substring(0, 1)) {
-      //     case 'b':
-      //       network = "binance"
-      //       break;
-      //     case 'p':
-      //       network = "polygon"
-      //       break;
-      //     case 'a':
-      //       network = "arbitrum"
-      //       break;
-      //   }
-      //   const txData: TransactionData = {
-      //     txHash: receipt.transactionHash,
-      //     tokenType: token?.substring(1).toUpperCase() || "",
-      //     network: network,
-      //     fromAddr: user?.address as any,
-      //     toAddr: CONFIG.RECEIVER_ADDRESS,
-      //     amount: price,      
-      //   };
-      //   handleBuyTheme(themeId as string, txData);
-      // }
+      if (receipt) {
+        let network = "fuse";
+        switch(token?.substring(0, 1)) {
+          case 'b':
+            network = "binance"
+            break;
+          case 'p':
+            network = "polygon"
+            break;
+          case 'a':
+            network = "arbitrum"
+            break;
+        }
+        const txData: TransactionData = {
+          txHash: receipt.transactionHash,
+          tokenType: token?.substring(1).toUpperCase() || "",
+          network: network,
+          fromAddr: user?.address as any,
+          toAddr: CONFIG.RECEIVER_ADDRESS,
+          amount: price,      
+        };
+        handleBuyTheme(themeId as string, txData);
+      }
     } catch (error) {
       console.error(error);
     } finally {

@@ -20,7 +20,7 @@ export const HomeLayout: React.FC<{
   });
   const [{ name: themeName }, setTheme] = useTheme(config.theme);
 
-  const { userBalance, setUserBalance, getUserGameTokenBalance } = useWeb3Context();
+  const { userBalance } = useWeb3Context();
   useEffect(() => { console.log("userBalance", userBalance) }, [userBalance]);
 
   useEffect(() => {

@@ -177,13 +177,14 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 }
 
                 const signedTx = await web3_2.eth.accounts.signTransaction(transferTransaction, account.privateKey);
+                
                 //const receipt = await web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
 
                 // Replace the problematic line with this event-based approach
                 return new Promise((resolve, reject) => {
 
                     const promiEvent = web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
-
+                    
                     promiEvent
                         .on('transactionHash', (hash) => {
                             toast.info(`Transaction submitted with hash: ${hash.substring(0, 10)}...`);
