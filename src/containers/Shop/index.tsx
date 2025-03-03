@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Button from '../../components/Button';
 import { IoArrowBack } from 'react-icons/io5';
 import Tabs from '../../components/Tabs';

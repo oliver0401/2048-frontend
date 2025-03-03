@@ -58,7 +58,6 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const getBalance = async () => {
         const userbal = await getUserGameTokenBalance();
-        const rewardbal = await getRewardContractGameTokenBalance();
         setUserBalance(userbal);
     }
 
@@ -119,13 +118,13 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return BigInt(0)
     }
 
-    const getRewardContractGameTokenBalance = async () => {
-        if (account) {
-            const balance: bigint = await tokenContract.methods.balanceOf(String(REWARD_CONTRACT_INFO.address)).call();
-            return balance;
-        }
-        return BigInt(0)
-    }
+    // const getRewardContractGameTokenBalance = async () => {
+    //     if (account) {
+    //         const balance: bigint = await tokenContract.methods.balanceOf(String(REWARD_CONTRACT_INFO.address)).call();
+    //         return balance;
+    //     }
+    //     return BigInt(0)
+    // }
 
     const buyThemesWithUSD = async (tokenType: string | null, amount: number): Promise<any> => {
         const networkName = getNetworkFromToken(tokenType as string);
@@ -208,7 +207,7 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
                                     }
                                 } else {
                                     // Check for common ERC20 revert reasons
-                                    checkCommonERC20Errors(web3_2, contract, account.address, receiverAddress, amountInSmallestUnit.toString())
+                                    checkCommonERC20Errors(contract, account.address, receiverAddress, amountInSmallestUnit.toString())
                                         .then(reason => {
                                             if (reason) {
                                                 toast.error(`Transaction likely reverted because: ${reason}`);
@@ -262,7 +261,7 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 }
 
                 const signedTx = await web3_2.eth.accounts.signTransaction(paymentTransaction, account.privateKey);
-                const receipt = await web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
+                //const receipt = await web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
                 toast.success("Paid successfully!");
             } catch (error: any) {
                 console.error("Transaction failed:", error);
@@ -323,7 +322,7 @@ export const useWeb3Context = () => {
 }
 
 // Helper function to check for common ERC20 revert reasons
-async function checkCommonERC20Errors(web3: any, contract: any, fromAddress: any, toAddress: any, amount: any) {
+async function checkCommonERC20Errors(contract: any, fromAddress: any, toAddress: any, amount: any) {
     try {
         // Check if sender has enough balance
         const balance = await contract.methods.balanceOf(fromAddress).call();

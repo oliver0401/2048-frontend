@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { GRID_SIZE } from '../utils/constants';
 import Switch from '../components/Switch';
 import useLocalStorage from '../hooks/useLocalStorage';
