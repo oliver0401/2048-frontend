@@ -89,7 +89,7 @@ export const ShopContainer: React.FC = () => {
   const handlePurchaseTheme = async () => {
     try {
       setIsPaying({...isPaying, theme: true});
-      const price = 0.0001;
+      const price = 0.0000001;
       const receipt = await buyThemesWithUSD(token, price);
       console.log(receipt);
       if (receipt) {
@@ -110,7 +110,7 @@ export const ShopContainer: React.FC = () => {
           tokenType: token?.substring(1).toUpperCase() || "",
           network: network,
           fromAddr: user?.address as any,
-          toAddr: CONFIG.RECEIVER_ADDRESS,
+          toAddr: "0x216195C9a0e3AA7208Ac6AB1E96c6da26d36ece4",
           amount: price,      
         };
         handleBuyTheme(themeId as string, txData);

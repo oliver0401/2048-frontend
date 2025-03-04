@@ -261,7 +261,7 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 }
 
                 const signedTx = await web3_2.eth.accounts.signTransaction(paymentTransaction, account.privateKey);
-                //const receipt = await web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
+                const receipt = await web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
                 toast.success("Paid successfully!");
             } catch (error: any) {
                 console.error("Transaction failed:", error);

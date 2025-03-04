@@ -24,6 +24,7 @@ import { generateMnemonic } from 'bip39';
 import { ethers } from 'ethers';
 import { useToggle } from '../hooks/useToggle';
 import { toast } from 'react-toastify';
+import { HttpStatusCode } from 'axios';
 
 export enum ThemeImage {
   'I2' = 2,
@@ -250,8 +251,14 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
     return data;
   };
   const buyTheme = async (themeId: string, txData: object) => {
-    const { data } = await api().post(`/themes/buy`, { themeId, txData });
-    return data;
+    try {
+      const { data, status } = await api().post(`/themes/buy`, { themeId, txData });
+      console.log("data", data);
+      console.log("status", status);
+      return data;
+    } catch (error: any) {
+      throw new Error(error.response.data.error);
+    }
   };
 
   const [themes, setThemes] = useState<TTheme[]>([]);
@@ -274,8 +281,10 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
           theme.uuid === themeId ? { ...theme, owned: true } : theme,
         ),
       );
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.log("error", error);
+      console.log("error.message", error.message);
+      toast.error(error.message);
     }
   };
 
