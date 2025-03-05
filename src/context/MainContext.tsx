@@ -24,7 +24,6 @@ import { generateMnemonic } from 'bip39';
 import { ethers } from 'ethers';
 import { useToggle } from '../hooks/useToggle';
 import { toast } from 'react-toastify';
-import { HttpStatusCode } from 'axios';
 
 export enum ThemeImage {
   'I2' = 2,
