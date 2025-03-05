@@ -186,7 +186,6 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
                         tokenContractInfo.address
                     );
 
-
                     // Convert amount to proper format if needed (e.g., for tokens with decimals)
                     // Check the decimals of the token
                     const decimals = await contract.methods.decimals().call();
@@ -221,9 +220,6 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
                     console.log(gasPrice);
 
-                    //const receipt = await web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
-
-                    // Replace the problematic line with this event-based approach
                     return new Promise((resolve, reject) => {
 
                         const promiEvent = web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
