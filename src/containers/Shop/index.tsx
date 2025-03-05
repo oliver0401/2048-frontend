@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Button from '../../components/Button';
 import { IoArrowBack } from 'react-icons/io5';
 import Tabs from '../../components/Tabs';
 import { useMainContext, useWeb3Context } from '../../context';
-import { PATH, TOKEN } from '../../consts';
+import { CONFIG, PATH, TOKEN } from '../../consts';
 import ItemsTab from './components/ItemsTab'; // Import the new ItemsTab component
 import BorderSizeTab from './components/BorderSizeTab'; // Import the new BorderSizeTab component
 import ThemeTab from './components/ThemeTab'; // Import the new ThemeTab component
@@ -11,9 +11,18 @@ import { useNavigate } from 'react-router-dom';
 import Modal from '../../components/Modal';
 import { TUser } from '../../types';
 
+interface TransactionData {
+  txHash: string;
+  tokenType: string | "USDT" | "USDC";
+  network: string | "binance" | "arbitrum" | "polygon";
+  fromAddr: string;
+  toAddr: string;
+  amount: number;
+}
+
 export const ShopContainer: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPaying, setIsPaying] = useState({item: false, rows: false, cols: false, theme: false});
+  const [isPaying, setIsPaying] = useState({ item: false, rows: false, cols: false, theme: false });
   const { user, handleBuyTheme, handleUpdateUser } = useMainContext();
   const { buyItemsWithGameTokens, buyThemesWithUSD } = useWeb3Context();
   const navigate = useNavigate();
@@ -25,12 +34,12 @@ export const ShopContainer: React.FC = () => {
     quantity: Partial<TUser>
     id?: string;
   }) => {
-    if(item.type === 'item')
-      setIsPaying({...isPaying, item: true});
-    if(item.type === 'border-rows')
-      setIsPaying({...isPaying, rows: true});
-    if(item.type === 'border-cols')
-      setIsPaying({...isPaying, cols: true});
+    if (item.type === 'item')
+      setIsPaying({ ...isPaying, item: true });
+    if (item.type === 'border-rows')
+      setIsPaying({ ...isPaying, rows: true });
+    if (item.type === 'border-cols')
+      setIsPaying({ ...isPaying, cols: true });
     try {
       console.log(item.price);
       await buyItemsWithGameTokens(item.price);
@@ -65,7 +74,7 @@ export const ShopContainer: React.FC = () => {
     } catch (error: any) {
       console.log(error);
     } finally {
-      setIsPaying({...isPaying, item: false, rows: false, cols: false});
+      setIsPaying({ ...isPaying, item: false, rows: false, cols: false });
     }
   };
 
@@ -79,16 +88,44 @@ export const ShopContainer: React.FC = () => {
 
   const handlePurchaseTheme = async () => {
     try {
-      console.log("here");
-      setIsPaying({...isPaying, theme: true});
-      const price = 0.000001;
-      const amountInWei = Number(price * 1_000_000);
-      await buyThemesWithUSD(token, amountInWei);  
-      handleBuyTheme(themeId as string);
+      setIsPaying({ ...isPaying, theme: true });
+      const price = 0.00000000001;
+      const receipt = await buyThemesWithUSD(token, price);
+      console.log(receipt);
+      if (receipt) {
+        let network = "fuse";
+        switch (token?.substring(0, 1)) {
+          case 'b':
+            network = "binance"
+            break;
+          case 'p':
+            network = "polygon"
+            break;
+          case 'a':
+            network = "arbitrum"
+            break;
+          case 'f':
+            network = "fuse"
+            break;
+          default:
+            network = "fuse"
+            break;
+        }
+        const type = token?.substring(1).toLowerCase();
+        const txData: TransactionData = {
+          txHash: receipt.transactionHash,
+          tokenType: (type === "usdt" || type === "usdc") ? type : token as any,
+          network: network,
+          fromAddr: user?.address as any,
+          toAddr: CONFIG.RECEIVER_ADDRESS,
+          amount: price
+        };
+        handleBuyTheme(themeId as string, txData);
+      }
     } catch (error) {
       console.error(error);
     } finally {
-      setIsPaying({...isPaying, theme: false});
+      setIsPaying({ ...isPaying, theme: false });
       setIsModalOpen(false);
       setToken(null);
       setThemeId(null);
@@ -121,11 +158,11 @@ export const ShopContainer: React.FC = () => {
       },
       {
         label: 'Border Size',
-        content: <BorderSizeTab user={user} handlePurchase={handlePurchase} isPaying={{rows: isPaying.rows, cols: isPaying.cols}}/>,
+        content: <BorderSizeTab user={user} handlePurchase={handlePurchase} isPaying={{ rows: isPaying.rows, cols: isPaying.cols }} />,
       },
       {
         label: 'Theme',
-        content: <ThemeTab handlePurchaseModal={handlePurchaseThemeModal}/>,
+        content: <ThemeTab handlePurchaseModal={handlePurchaseThemeModal} />,
       },
     ],
     [user, isPaying],

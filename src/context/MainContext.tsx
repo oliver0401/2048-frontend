@@ -65,7 +65,7 @@ interface MainContextType {
   themes: TTheme[];
   setThemes: (themes: TTheme[]) => void;
   handleGetThemes: () => Promise<void>;
-  handleBuyTheme: (themeId: string) => Promise<void>;
+  handleBuyTheme: (themeId: string, txData: object) => Promise<void>;
   theme: string;
   setTheme: (theme: string) => void;
   themeImages: Record<ThemeImage, TTileImg | undefined>;
@@ -249,9 +249,15 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
     const { data } = await api().get('/themes');
     return data;
   };
-  const buyTheme = async (themeId: string) => {
-    const { data } = await api().post(`/themes/buy`, { themeId });
-    return data;
+  const buyTheme = async (themeId: string, txData: object) => {
+    try {
+      const { data, status } = await api().post(`/themes/buy`, { themeId, txData });
+      console.log("data", data);
+      console.log("status", status);
+      return data;
+    } catch (error: any) {
+      throw new Error("error.response.data.error");
+    }
   };
 
   const [themes, setThemes] = useState<TTheme[]>([]);
@@ -265,16 +271,19 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const handleBuyTheme = async (themeId: string) => {
+  const handleBuyTheme = async (themeId: string, txData: object) => {
     try {
-      await buyTheme(themeId);
+      await buyTheme(themeId, txData);
+      toast.success("Theme Purchased Successfully!");
       setThemes(
         themes.map((theme) =>
           theme.uuid === themeId ? { ...theme, owned: true } : theme,
         ),
       );
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.log("error", error);
+      console.log("error.message", error.message);
+      toast.error(error.message);
     }
   };
 
