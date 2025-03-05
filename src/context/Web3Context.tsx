@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Web3, Web3BaseWalletAccount } from 'web3';
 import { TOKEN_CONTRACT_INFO, REWARD_CONTRACT_INFO } from '../contracts';
 import { useMainContext } from './MainContext';
 import { CONFIG, TOKEN } from '../consts';
 import { createWeb3Instance } from '../utils/web3config';
+// import { createGasPriceStrategy } from '../utils/gasPriceStrategy';
 
 interface Web3ContextType {
     web3: Web3;
@@ -78,6 +80,16 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const { tokenContract, rewardContract } = getContracts();
 
     const contractByName: ContractByName = {
+        fuse: {
+            fusdt: {
+                abi: TOKEN.CONTRACT_ABI.FUSDT,
+                address: TOKEN.CONTRACT_ADDRESS.FUSDT,
+            },
+            fusdc: {
+                abi: TOKEN.CONTRACT_ABI.FUSDC,
+                address: TOKEN.CONTRACT_ADDRESS.FUSDC,
+            },
+        },
         binance: {
             busdt: {
                 abi: TOKEN.CONTRACT_ABI.BUSDT,
@@ -126,6 +138,27 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
     //     return BigInt(0)
     // }
 
+    const getUsdtPriceInNativeToken = async (tokenType: string | null): Promise<number> => {
+        try {
+            const coinId = CONFIG.COINGECKO_ID[tokenType as any];
+            const response = await axios.get(`https://api.coingecko.com/api/v3/simple/price`, {
+                params: {
+                    ids: coinId,
+                    vs_currencies: "usd"
+                }
+            });
+
+            const priceInUSD = response.data[coinId]?.usd;
+            if (!priceInUSD) throw new Error("Price fetch failed");
+
+            return 1 / priceInUSD; // Convert 1 USDT to native token amount
+        } catch (error) {
+            console.error("Error fetching price:", error);
+            throw error;
+        }
+
+    }
+
     const buyThemesWithUSD = async (tokenType: string | null, amount: number): Promise<any> => {
         const networkName = getNetworkFromToken(tokenType as string);
         const providerUrl = getProviderUrl(tokenType || "");
@@ -136,102 +169,189 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 web3_2.eth.accounts.wallet.add(account);
                 web3_2.eth.defaultAccount = account.address;
 
-                // Get the token contract on the source network
-                if (!contractByName[networkName] || !contractByName[networkName][tokenType?.toLowerCase() as string]) {
-                    toast.error(`Token ${tokenType} not supported on ${networkName}`);
-                    return;
-                }
-
-                const tokenContractInfo = contractByName[networkName][tokenType?.toLowerCase() as string];
-                const contract = new web3_2.eth.Contract(
-                    tokenContractInfo.abi,
-                    tokenContractInfo.address
-                );
-
                 const receiverAddress = CONFIG.RECEIVER_ADDRESS;
 
+                const type = tokenType?.substring(1).toUpperCase();
 
-                // Convert amount to proper format if needed (e.g., for tokens with decimals)
-                // Check the decimals of the token
-                const decimals = await contract.methods.decimals().call();
-                const amountInSmallestUnit = web3_2.utils.toBigInt(
-                    amount * 10 ** Number(decimals)
-                );
-                console.log(amountInSmallestUnit);
+                if (type === "USDT" || type === "USDC") {
+                    // Get the token contract on the source network
+                    if (!contractByName[networkName] || !contractByName[networkName][tokenType?.toLowerCase() as string]) {
+                        toast.error(`Token ${tokenType} not supported on ${networkName}`);
+                        return;
+                    }
 
-                // Now transfer the tokens
-                const balanceOfUser: bigint = await contract.methods.balanceOf(account.address).call();
-                const balanceOfServer: bigint = await contract.methods.balanceOf(receiverAddress).call();
-                console.log(`UserBalance: ${balanceOfUser} / ServerBalance: ${balanceOfServer} / amount: ${BigInt(amountInSmallestUnit)}`);
-                const transferData = contract.methods.transfer(receiverAddress, amountInSmallestUnit).encodeABI();
+                    const tokenContractInfo = contractByName[networkName][tokenType?.toLowerCase() as string];
+                    const contract = new web3_2.eth.Contract(
+                        tokenContractInfo.abi,
+                        tokenContractInfo.address
+                    );
 
-                const gasPrice: bigint = await web3_2.eth.getGasPrice();
 
-                const transferTransaction = {
-                    from: account.address,
-                    to: contract.options.address,
-                    gas: 100000,
-                    gasPrice: gasPrice,
-                    data: transferData
+                    // Convert amount to proper format if needed (e.g., for tokens with decimals)
+                    // Check the decimals of the token
+                    const decimals = await contract.methods.decimals().call();
+                    console.log(decimals);
+                    const amountInSmallestUnit = web3_2.utils.toBigInt(
+                        amount * 10 ** Number(decimals)
+                    );
+                    console.log(amountInSmallestUnit);
+
+                    // Now transfer the tokens
+                    const balanceOfUser: bigint = await contract.methods.balanceOf(account.address).call();
+                    const balanceOfServer: bigint = await contract.methods.balanceOf(receiverAddress).call();
+                    console.log(`UserBalance: ${balanceOfUser} / ServerBalance: ${balanceOfServer} / amount: ${BigInt(amountInSmallestUnit)}`);
+                    const transferData = contract.methods.transfer(receiverAddress, amountInSmallestUnit).encodeABI();
+
+                    const gasPrice: bigint = await web3_2.eth.getGasPrice();
+                    //console.log(`Reward gas price: ${gasPriceStrategy.getGasPriceInGwei(rewardGasPrice)} Gwei`);
+
+                    const nonce = await web3_2.eth.getTransactionCount(account.address, "latest");
+                    console.log(nonce);
+
+                    const transferTransaction = {
+                        from: account.address,
+                        to: contract.options.address,
+                        gas: 100000,
+                        gasPrice: gasPrice,
+                        data: transferData,
+                        nonce
+                    }
+
+                    const signedTx = await web3_2.eth.accounts.signTransaction(transferTransaction, account.privateKey);
+
+                    console.log(gasPrice);
+
+                    //const receipt = await web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
+
+                    // Replace the problematic line with this event-based approach
+                    return new Promise((resolve, reject) => {
+
+                        const promiEvent = web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
+
+                        promiEvent
+                            .on('transactionHash', (hash) => {
+                                toast.info(`Transaction submitted with hash: ${hash.substring(0, 10)}...`);
+                            })
+                            .then((receipt) => {
+                                toast.success("Payment successful!");
+                                resolve(receipt);
+                            })
+                            .catch((error) => {
+                                console.error("Transaction error:", error);
+
+                                // More detailed error handling
+                                if (error.message.includes("Transaction has been reverted by the EVM")) {
+                                    // Try to get more specific information about why it was reverted
+
+                                    // Check if there's a reason string
+                                    if (error.message.includes("reason string")) {
+                                        const reasonMatch = error.message.match(/reason string: '(.+)'/);
+                                        if (reasonMatch && reasonMatch[1]) {
+                                            toast.error(`Transaction reverted: ${reasonMatch[1]}`);
+                                        }
+                                    } else {
+                                        // Check for common ERC20 revert reasons
+                                        checkCommonERC20Errors(contract, account.address, receiverAddress, amountInSmallestUnit.toString())
+                                            .then(reason => {
+                                                if (reason) {
+                                                    toast.error(`Transaction likely reverted because: ${reason}`);
+                                                } else {
+                                                    toast.error("Transaction reverted by the contract. Check if the contract has transfer restrictions.");
+                                                }
+                                            })
+                                            .catch(() => {
+                                                toast.error("Transaction reverted by the contract.");
+                                            });
+                                    }
+                                } else if (error.message.includes("insufficient funds")) {
+                                    toast.error("Insufficient funds for gas");
+                                } else if (error.message.includes("nonce too low")) {
+                                    toast.error("Transaction nonce issue. Try again.");
+                                } else if (error.message.includes("gas limit")) {
+                                    toast.error("Gas limit issue. Try with higher gas.");
+                                } else {
+                                    toast.error(`Payment failed: ${error.message || "Unknown error"}`);
+                                }
+
+                                reject(error);
+                            });
+                    });
+                } else {
+                    const nativeTokenAmount = await getUsdtPriceInNativeToken(tokenType);
+                    console.log(`1 USDT ≈ ${nativeTokenAmount} ${tokenType}`);
+
+                    // Convert amount to Wei
+                    const amountInWei = web3_2.utils.toBigInt(
+                        Math.floor(amount * nativeTokenAmount * 10 ** 18)
+                    );
+                    console.log(amountInWei);
+
+                    // Get nonce
+                    const nonce = await web3_2.eth.getTransactionCount(account.address, "latest");
+                    console.log(nonce);
+
+                    const gasPrice = await web3_2.eth.getGasPrice();
+
+                    // Define transaction details
+                    const txData = {
+                        from: account.address,
+                        to: receiverAddress,
+                        value: amountInWei,
+                        gas: 21000,
+                        gasPrice: gasPrice,
+                        nonce
+                    };
+
+                    // Sign transaction
+                    const signedTx = await web3_2.eth.accounts.signTransaction(txData, account.privateKey);
+                    if (!signedTx.rawTransaction) throw new Error("Transaction signing failed");
+                    // Send transaction
+                    console.log(gasPrice);
+                    return new Promise((resolve, reject) => {
+
+                        const promiEvent = web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
+
+                        promiEvent
+                            .on('transactionHash', (hash) => {
+                                toast.info(`Transaction submitted with hash: ${hash.substring(0, 10)}...`);
+                            })
+                            .then((receipt) => {
+                                toast.success("Payment successful!");
+                                resolve(receipt);
+                            })
+                            .catch((error) => {
+                                console.error("Transaction error:", error);
+
+                                // More detailed error handling
+                                if (error.message.includes("Transaction has been reverted by the EVM")) {
+                                    // Try to get more specific information about why it was reverted
+
+                                    // Check if there's a reason string
+                                    if (error.message.includes("reason string")) {
+                                        const reasonMatch = error.message.match(/reason string: '(.+)'/);
+                                        if (reasonMatch && reasonMatch[1]) {
+                                            toast.error(`Transaction reverted: ${reasonMatch[1]}`);
+                                        }
+                                    } else {
+                                        toast.error("no reason string");
+                                    }
+                                } else if (error.message.includes("insufficient funds")) {
+                                    toast.error("Insufficient funds for gas");
+                                } else if (error.message.includes("nonce too low")) {
+                                    toast.error("Transaction nonce issue. Try again.");
+                                } else if (error.message.includes("gas limit")) {
+                                    toast.error("Gas limit issue. Try with higher gas.");
+                                } else {
+                                    toast.error(`Payment failed: ${error.message || "Unknown error"}`);
+                                }
+
+                                reject(error);
+                            });
+                    });
+
                 }
 
-                const signedTx = await web3_2.eth.accounts.signTransaction(transferTransaction, account.privateKey);
-                
-                //const receipt = await web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
 
-                // Replace the problematic line with this event-based approach
-                return new Promise((resolve, reject) => {
-
-                    const promiEvent = web3_2.eth.sendSignedTransaction(signedTx.rawTransaction!);
-                    
-                    promiEvent
-                        .on('transactionHash', (hash) => {
-                            toast.info(`Transaction submitted with hash: ${hash.substring(0, 10)}...`);
-                        })
-                        .then((receipt) => {
-                            toast.success("Payment successful!");
-                            resolve(receipt);
-                        })
-                        .catch((error) => {
-                            console.error("Transaction error:", error);
-
-                            // More detailed error handling
-                            if (error.message.includes("Transaction has been reverted by the EVM")) {
-                                // Try to get more specific information about why it was reverted
-
-                                // Check if there's a reason string
-                                if (error.message.includes("reason string")) {
-                                    const reasonMatch = error.message.match(/reason string: '(.+)'/);
-                                    if (reasonMatch && reasonMatch[1]) {
-                                        toast.error(`Transaction reverted: ${reasonMatch[1]}`);
-                                    }
-                                } else {
-                                    // Check for common ERC20 revert reasons
-                                    checkCommonERC20Errors(contract, account.address, receiverAddress, amountInSmallestUnit.toString())
-                                        .then(reason => {
-                                            if (reason) {
-                                                toast.error(`Transaction likely reverted because: ${reason}`);
-                                            } else {
-                                                toast.error("Transaction reverted by the contract. Check if the contract has transfer restrictions.");
-                                            }
-                                        })
-                                        .catch(() => {
-                                            toast.error("Transaction reverted by the contract.");
-                                        });
-                                }
-                            } else if (error.message.includes("insufficient funds")) {
-                                toast.error("Insufficient funds for gas");
-                            } else if (error.message.includes("nonce too low")) {
-                                toast.error("Transaction nonce issue. Try again.");
-                            } else if (error.message.includes("gas limit")) {
-                                toast.error("Gas limit issue. Try with higher gas.");
-                            } else {
-                                toast.error(`Payment failed: ${error.message || "Unknown error"}`);
-                            }
-
-                            reject(error);
-                        });
-                });
                 // toast.success("Paid successfully!");
 
             } catch (error: any) {
@@ -275,6 +395,7 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (tokenType.startsWith('b')) return 'binance';
         if (tokenType.startsWith('a')) return 'arbitrum';
         if (tokenType.startsWith('p')) return 'polygon';
+        if (tokenType.startsWith('f')) return 'fuse';
         return 'fuse';
     };
 
@@ -282,13 +403,20 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
         switch (network) {
             case 'busdt':
             case 'busdc':
+            case 'bnb':
                 return CONFIG.BNB_PROVIDER_URL;
             case 'ausdt':
             case 'ausdc':
+            case 'arb':
                 return CONFIG.ABT_PROVIDER_URL;
             case 'pusdt':
             case 'pusdc':
+            case 'pol':
                 return CONFIG.POL_PROVIDER_URL;
+            case 'fusdt':
+            case 'fusdc':
+            case 'fuse':
+                return CONFIG.FUSE_PROVIDER_URL;
             default:
                 return CONFIG.FUSE_PROVIDER_URL;
         }

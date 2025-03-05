@@ -22,7 +22,7 @@ interface TransactionData {
 
 export const ShopContainer: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPaying, setIsPaying] = useState({item: false, rows: false, cols: false, theme: false});
+  const [isPaying, setIsPaying] = useState({ item: false, rows: false, cols: false, theme: false });
   const { user, handleBuyTheme, handleUpdateUser } = useMainContext();
   const { buyItemsWithGameTokens, buyThemesWithUSD } = useWeb3Context();
   const navigate = useNavigate();
@@ -34,12 +34,12 @@ export const ShopContainer: React.FC = () => {
     quantity: Partial<TUser>
     id?: string;
   }) => {
-    if(item.type === 'item')
-      setIsPaying({...isPaying, item: true});
-    if(item.type === 'border-rows')
-      setIsPaying({...isPaying, rows: true});
-    if(item.type === 'border-cols')
-      setIsPaying({...isPaying, cols: true});
+    if (item.type === 'item')
+      setIsPaying({ ...isPaying, item: true });
+    if (item.type === 'border-rows')
+      setIsPaying({ ...isPaying, rows: true });
+    if (item.type === 'border-cols')
+      setIsPaying({ ...isPaying, cols: true });
     try {
       console.log(item.price);
       await buyItemsWithGameTokens(item.price);
@@ -74,7 +74,7 @@ export const ShopContainer: React.FC = () => {
     } catch (error: any) {
       console.log(error);
     } finally {
-      setIsPaying({...isPaying, item: false, rows: false, cols: false});
+      setIsPaying({ ...isPaying, item: false, rows: false, cols: false });
     }
   };
 
@@ -88,13 +88,13 @@ export const ShopContainer: React.FC = () => {
 
   const handlePurchaseTheme = async () => {
     try {
-      setIsPaying({...isPaying, theme: true});
-      const price = 0.0000001;
+      setIsPaying({ ...isPaying, theme: true });
+      const price = 0.00000000001;
       const receipt = await buyThemesWithUSD(token, price);
       console.log(receipt);
       if (receipt) {
         let network = "fuse";
-        switch(token?.substring(0, 1)) {
+        switch (token?.substring(0, 1)) {
           case 'b':
             network = "binance"
             break;
@@ -104,21 +104,28 @@ export const ShopContainer: React.FC = () => {
           case 'a':
             network = "arbitrum"
             break;
+          case 'f':
+            network = "fuse"
+            break;
+          default:
+            network = "fuse"
+            break;
         }
+        const type = token?.substring(1).toLowerCase();
         const txData: TransactionData = {
           txHash: receipt.transactionHash,
-          tokenType: token?.substring(1).toUpperCase() || "",
+          tokenType: (type === "usdt" || type === "usdc") ? type : token as any,
           network: network,
           fromAddr: user?.address as any,
-          toAddr: "0x216195C9a0e3AA7208Ac6AB1E96c6da26d36ece4",
-          amount: price,      
+          toAddr: CONFIG.RECEIVER_ADDRESS,
+          amount: price
         };
         handleBuyTheme(themeId as string, txData);
       }
     } catch (error) {
       console.error(error);
     } finally {
-      setIsPaying({...isPaying, theme: false});
+      setIsPaying({ ...isPaying, theme: false });
       setIsModalOpen(false);
       setToken(null);
       setThemeId(null);
@@ -151,11 +158,11 @@ export const ShopContainer: React.FC = () => {
       },
       {
         label: 'Border Size',
-        content: <BorderSizeTab user={user} handlePurchase={handlePurchase} isPaying={{rows: isPaying.rows, cols: isPaying.cols}}/>,
+        content: <BorderSizeTab user={user} handlePurchase={handlePurchase} isPaying={{ rows: isPaying.rows, cols: isPaying.cols }} />,
       },
       {
         label: 'Theme',
-        content: <ThemeTab handlePurchaseModal={handlePurchaseThemeModal}/>,
+        content: <ThemeTab handlePurchaseModal={handlePurchaseThemeModal} />,
       },
     ],
     [user, isPaying],

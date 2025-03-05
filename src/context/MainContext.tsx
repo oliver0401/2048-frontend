@@ -257,7 +257,7 @@ export const MainProvider: React.FC<{ children: ReactNode }> = ({
       console.log("status", status);
       return data;
     } catch (error: any) {
-      throw new Error(error.response.data.error);
+      throw new Error("error.response.data.error");
     }
   };
 
